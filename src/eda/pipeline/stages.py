@@ -16,7 +16,7 @@ from __future__ import annotations
 import math
 import os
 import time
-from collections import defaultdict
+from collections import defaultdict, deque
 from typing import Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
@@ -52,6 +52,7 @@ class Ingestion:
         self.queue = LinkedQueue(capacity)
         self.exhausted = False
         self.received = 0
+        self.rejected = 0  # veces que la cola estuvo llena (backpressure)
 
     def fill(self, n: int) -> None:
         while len(self.queue) < n and not self.exhausted:
@@ -63,6 +64,9 @@ class Ingestion:
             if self.queue.enqueue(ev):
                 self.received += 1
                 ev.note("S0", f"encolado (cola={len(self.queue)})")
+            else:  # cola llena: el productor se detiene
+                self.rejected += 1
+                break
 
     def next_batch(self, size: int) -> List[Event]:
         self.fill(size)
@@ -73,12 +77,15 @@ class Ingestion:
 class Preprocessor:
     """S1: valida, normaliza, ordena por tiempo (merge sort) y elimina duplicados.
 
-    Deduplicación en dos niveles: dentro del lote (ids adyacentes tras ordenar)
-    y contra una ventana de ids ya vistos (arreglo ordenado + búsqueda binaria).
+    Deduplicación exacta en dos niveles: dentro del lote (ids adyacentes tras
+    ordenar) y contra una ventana deslizante de ids ya vistos, implementada
+    como conjunto hash más un anillo de expiración: O(1) por evento y memoria
+    acotada a la ventana (Semana 04: conjunto hash para membresía).
     """
 
     def __init__(self, window_ids: int = 500_000) -> None:
-        self.seen = np.empty(0, dtype=np.int64)
+        self.seen = HashSet(max(16, window_ids * 2))
+        self.ring: deque = deque()
         self.window_ids = window_ids
         self.invalid = 0
         self.duplicates = 0
@@ -108,17 +115,16 @@ class Preprocessor:
                 continue
             last = e.event_id
             unique.append(e)
-        ids = np.fromiter((e.event_id for e in unique), dtype=np.int64, count=len(unique))
-        seen_mask = contains_sorted(self.seen, ids)  # duplicados contra la ventana
         out = []
-        for e, dup in zip(unique, seen_mask.tolist()):
-            if dup:
+        for e in unique:
+            if e.event_id in self.seen:  # duplicado contra la ventana
                 self._drop(e)
-            else:
-                out.append(e)
-        self.seen = merge_sorted_arrays(self.seen, ids[~seen_mask])
-        if self.seen.size > self.window_ids:
-            self.seen = self.seen[-self.window_ids:]
+                continue
+            self.seen.add(e.event_id)
+            self.ring.append(e.event_id)
+            if len(self.ring) > self.window_ids:  # expira el más antiguo
+                self.seen.discard(self.ring.popleft())
+            out.append(e)
         out = merge_sort(out, key=lambda e: e.ts)
         for e in out:
             e.note("S1", "válido, normalizado y no duplicado")

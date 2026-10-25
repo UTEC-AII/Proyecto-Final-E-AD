@@ -43,7 +43,7 @@ class StreamPipeline:
         window = labels if limit is None else labels.iloc[:limit]
         self.trace_event = trace_event if trace_event is not None else self._pick_trace(window)
         self.store = Store(catalog)
-        self.s0 = Ingestion(self._source(), capacity=4 * batch_size)
+        self.s0 = Ingestion(self._source(), capacity=batch_size)
         self.s1 = Preprocessor()
         self.s2 = Prioritizer()
         self.s4 = DiskIndex(self.store, workdir)
@@ -131,6 +131,7 @@ class StreamPipeline:
             "eventos_que_pasan_el_filtro": self.passed,
             "segundos": round(self.elapsed, 2),
             "eventos_por_segundo": round(self.processed / max(self.elapsed, 1e-9)),
+            "S0": {"rechazados_por_cola_llena": self.s0.rejected},
             "S1": {"invalidos": self.s1.invalid, "duplicados_eliminados": self.s1.duplicates,
                    "duplicados_reales_detectados": self.s1.dup_true_positive},
             "S2": dict(zip(self.s2.CLASSES, self.s2.by_class)),
