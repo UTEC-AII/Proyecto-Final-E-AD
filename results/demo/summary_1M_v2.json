@@ -1,0 +1,592 @@
+{
+  "eventos_recibidos": 1022378,
+  "eventos_que_pasan_el_filtro": 1001295,
+  "segundos": 27.37,
+  "eventos_por_segundo": 37358,
+  "S0": {
+    "rechazados_por_cola_llena": 0
+  },
+  "S1": {
+    "invalidos": 0,
+    "duplicados_eliminados": 15109,
+    "duplicados_reales_detectados": 15109
+  },
+  "S2": {
+    "compra express": 8831,
+    "compra premium": 1244,
+    "compra estándar": 16509,
+    "compra programada": 3494,
+    "carrito": 66293,
+    "vista": 910898
+  },
+  "S3": {
+    "productos": 20000,
+    "usuarios": 40170,
+    "interacciones_nnz": 758189,
+    "productos_nuevos_en_stream": 0
+  },
+  "S4": {
+    "ordenes_indexadas": 25630,
+    "altura_precio": 2,
+    "paginas_precio": 90,
+    "altura_ordenes": 2,
+    "paginas_ordenes": 202,
+    "lecturas_disco": 1,
+    "escrituras_disco": 91,
+    "paginas_por_busqueda": 2,
+    "paginas_por_rango": 3
+  },
+  "S6": {
+    "blocked": 5974,
+    "precision": 1.0,
+    "recall": 0.8211683848797251,
+    "bloom_positives": 3433,
+    "bloom_false_positives": 0,
+    "bloom_memory_bytes": 1798,
+    "cms_memory_bytes": 2174800,
+    "alerts_blacklist": 3433,
+    "alerts_card": 2541,
+    "alerts_device": 0,
+    "card_threshold": 12,
+    "device_threshold": 20,
+    "window_seconds": 600
+  },
+  "S8": {
+    "nodes_with_edges": 6368,
+    "edges": 23690,
+    "pagerank_iters": 80,
+    "pagerank_s": 0.011950875006732531,
+    "louvain_s": 0.07123716699425131,
+    "louvain_Q": 0.9144353938377319,
+    "louvain_k": 157,
+    "lpa_s": 0.051813291996950284,
+    "lpa_Q": 0.8530611021769725,
+    "lpa_k": 479,
+    "top20_overlap_pagerank_vs_degree": 0.85,
+    "largest_communities": [
+      718,
+      710,
+      660,
+      609,
+      598
+    ]
+  },
+  "tiempos_por_etapa_s": {
+    "setup": 0.106,
+    "S0 ingesta": 5.236,
+    "S1 preprocesamiento": 2.761,
+    "S2 prioridad": 1.937,
+    "S3 almacenamiento": 0.842,
+    "S6 filtrado": 3.006,
+    "S3 interacciones": 1.72,
+    "S4 B+Tree": 0.091,
+    "S5 KD-Tree": 0.005,
+    "S7 similitud": 0.005,
+    "S8 grafo": 0.048,
+    "S9 servicio": 0.178,
+    "S5 refresco KD-Tree": 0.102,
+    "S7 refresco LSH+IVF": 10.708,
+    "S8 refresco PageRank+Louvain": 0.515
+  },
+  "top_ventas": [
+    {
+      "idx": 7131,
+      "product_id": 1049919,
+      "name": "chanel fragrance 9865",
+      "brand": "chanel",
+      "category": "beauty.fragrance",
+      "price": 49.93,
+      "views": 30061,
+      "purchases": 886,
+      "ventas": 886
+    },
+    {
+      "idx": 6210,
+      "product_id": 1043473,
+      "name": "pioneer player 2436",
+      "brand": "pioneer",
+      "category": "auto.accessories.player",
+      "price": 179.07,
+      "views": 30086,
+      "purchases": 835,
+      "ventas": 835
+    },
+    {
+      "idx": 7687,
+      "product_id": 1053811,
+      "name": "puma keds 7164",
+      "brand": "puma",
+      "category": "apparel.shoes.keds",
+      "price": 29.63,
+      "views": 24073,
+      "purchases": 665,
+      "ventas": 665
+    },
+    {
+      "idx": 19479,
+      "product_id": 1136357,
+      "name": "barbie dolls 8203",
+      "brand": "barbie",
+      "category": "kids.dolls",
+      "price": 22.66,
+      "views": 21296,
+      "purchases": 606,
+      "ventas": 606
+    },
+    {
+      "idx": 16702,
+      "product_id": 1116914,
+      "name": "dyson vacuum 6379",
+      "brand": "dyson",
+      "category": "appliances.environment.vacuum",
+      "price": 190.53,
+      "views": 18260,
+      "purchases": 486,
+      "ventas": 486
+    },
+    {
+      "idx": 2611,
+      "product_id": 1018281,
+      "name": "makita lawn mower 2710",
+      "brand": "makita",
+      "category": "country_yard.lawn_mower",
+      "price": 262.87,
+      "views": 9299,
+      "purchases": 241,
+      "ventas": 241
+    },
+    {
+      "idx": 14623,
+      "product_id": 1102366,
+      "name": "nokia smartphone 1843",
+      "brand": "nokia",
+      "category": "electronics.smartphone",
+      "price": 355.09,
+      "views": 8034,
+      "purchases": 239,
+      "ventas": 239
+    },
+    {
+      "idx": 133,
+      "product_id": 1000933,
+      "name": "wilson tennis 8685",
+      "brand": "wilson",
+      "category": "sport.tennis",
+      "price": 35.73,
+      "views": 8108,
+      "purchases": 226,
+      "ventas": 226
+    },
+    {
+      "idx": 5740,
+      "product_id": 1040186,
+      "name": "adidas costume 2886",
+      "brand": "adidas",
+      "category": "apparel.costume",
+      "price": 33.27,
+      "views": 6951,
+      "purchases": 206,
+      "ventas": 206
+    },
+    {
+      "idx": 12501,
+      "product_id": 1087508,
+      "name": "torneo trainer 8192",
+      "brand": "torneo",
+      "category": "sport.trainer",
+      "price": 429.77,
+      "views": 4795,
+      "purchases": 153,
+      "ventas": 153
+    }
+  ],
+  "top_pagerank": [
+    {
+      "idx": 7687,
+      "product_id": 1053811,
+      "name": "puma keds 7164",
+      "brand": "puma",
+      "category": "apparel.shoes.keds",
+      "price": 29.63,
+      "views": 24073,
+      "purchases": 665,
+      "pagerank": 0.007212
+    },
+    {
+      "idx": 19479,
+      "product_id": 1136357,
+      "name": "barbie dolls 8203",
+      "brand": "barbie",
+      "category": "kids.dolls",
+      "price": 22.66,
+      "views": 21296,
+      "purchases": 606,
+      "pagerank": 0.007078
+    },
+    {
+      "idx": 7131,
+      "product_id": 1049919,
+      "name": "chanel fragrance 9865",
+      "brand": "chanel",
+      "category": "beauty.fragrance",
+      "price": 49.93,
+      "views": 30061,
+      "purchases": 886,
+      "pagerank": 0.00702
+    },
+    {
+      "idx": 16702,
+      "product_id": 1116914,
+      "name": "dyson vacuum 6379",
+      "brand": "dyson",
+      "category": "appliances.environment.vacuum",
+      "price": 190.53,
+      "views": 18260,
+      "purchases": 486,
+      "pagerank": 0.006889
+    },
+    {
+      "idx": 2611,
+      "product_id": 1018281,
+      "name": "makita lawn mower 2710",
+      "brand": "makita",
+      "category": "country_yard.lawn_mower",
+      "price": 262.87,
+      "views": 9299,
+      "purchases": 241,
+      "pagerank": 0.005455
+    },
+    {
+      "idx": 14623,
+      "product_id": 1102366,
+      "name": "nokia smartphone 1843",
+      "brand": "nokia",
+      "category": "electronics.smartphone",
+      "price": 355.09,
+      "views": 8034,
+      "purchases": 239,
+      "pagerank": 0.005449
+    },
+    {
+      "idx": 6210,
+      "product_id": 1043473,
+      "name": "pioneer player 2436",
+      "brand": "pioneer",
+      "category": "auto.accessories.player",
+      "price": 179.07,
+      "views": 30086,
+      "purchases": 835,
+      "pagerank": 0.005208
+    },
+    {
+      "idx": 5740,
+      "product_id": 1040186,
+      "name": "adidas costume 2886",
+      "brand": "adidas",
+      "category": "apparel.costume",
+      "price": 33.27,
+      "views": 6951,
+      "purchases": 206,
+      "pagerank": 0.003691
+    },
+    {
+      "idx": 133,
+      "product_id": 1000933,
+      "name": "wilson tennis 8685",
+      "brand": "wilson",
+      "category": "sport.tennis",
+      "price": 35.73,
+      "views": 8108,
+      "purchases": 226,
+      "pagerank": 0.003326
+    },
+    {
+      "idx": 2228,
+      "product_id": 1015597,
+      "name": "makita lawn mower 6868",
+      "brand": "makita",
+      "category": "country_yard.lawn_mower",
+      "price": 168.48,
+      "views": 4637,
+      "purchases": 115,
+      "pagerank": 0.003065
+    }
+  ],
+  "alertas_prioritarias": [
+    {
+      "severidad": 0,
+      "event_id": 5598,
+      "card_id": 6000000000000066,
+      "device_id": 3000000066,
+      "reason": "tarjeta/dispositivo en lista negra",
+      "ts": 15107.111058942339
+    },
+    {
+      "severidad": 0,
+      "event_id": 5599,
+      "card_id": 6000000000000066,
+      "device_id": 3000000066,
+      "reason": "tarjeta/dispositivo en lista negra",
+      "ts": 15110.572075853326
+    },
+    {
+      "severidad": 0,
+      "event_id": 5600,
+      "card_id": 6000000000000066,
+      "device_id": 3000000066,
+      "reason": "tarjeta/dispositivo en lista negra",
+      "ts": 15115.277326858315
+    },
+    {
+      "severidad": 0,
+      "event_id": 5602,
+      "card_id": 6000000000000066,
+      "device_id": 3000000066,
+      "reason": "tarjeta/dispositivo en lista negra",
+      "ts": 15116.579431582155
+    },
+    {
+      "severidad": 0,
+      "event_id": 5606,
+      "card_id": 6000000000000066,
+      "device_id": 3000000066,
+      "reason": "tarjeta/dispositivo en lista negra",
+      "ts": 15122.379760134703
+    },
+    {
+      "severidad": 0,
+      "event_id": 5607,
+      "card_id": 6000000000000066,
+      "device_id": 3000000066,
+      "reason": "tarjeta/dispositivo en lista negra",
+      "ts": 15128.43553032558
+    },
+    {
+      "severidad": 0,
+      "event_id": 5609,
+      "card_id": 6000000000000066,
+      "device_id": 3000000066,
+      "reason": "tarjeta/dispositivo en lista negra",
+      "ts": 15130.567496852516
+    },
+    {
+      "severidad": 0,
+      "event_id": 5615,
+      "card_id": 6000000000000066,
+      "device_id": 3000000066,
+      "reason": "tarjeta/dispositivo en lista negra",
+      "ts": 15135.133509887
+    },
+    {
+      "severidad": 0,
+      "event_id": 5616,
+      "card_id": 6000000000000066,
+      "device_id": 3000000066,
+      "reason": "tarjeta/dispositivo en lista negra",
+      "ts": 15135.744972133689
+    },
+    {
+      "severidad": 0,
+      "event_id": 5623,
+      "card_id": 6000000000000066,
+      "device_id": 3000000066,
+      "reason": "tarjeta/dispositivo en lista negra",
+      "ts": 15145.16344375762
+    }
+  ],
+  "autocompletado": {
+    "sam": [
+      [
+        "samsung",
+        4426.0
+      ],
+      [
+        "samsung tv",
+        847.0
+      ],
+      [
+        "samsung microwave",
+        509.0
+      ],
+      [
+        "samsung headphone",
+        479.0
+      ],
+      [
+        "samsung vacuum",
+        477.0
+      ]
+    ],
+    "app": [
+      [
+        "apple",
+        1878.0
+      ],
+      [
+        "apple clocks",
+        713.0
+      ],
+      [
+        "apple tablet",
+        607.0
+      ],
+      [
+        "apple smartphone",
+        276.0
+      ],
+      [
+        "apple headphone",
+        150.0
+      ]
+    ],
+    "lg ": [
+      [
+        "lg washer",
+        848.0
+      ],
+      [
+        "lg refrigerators",
+        675.0
+      ],
+      [
+        "lg air conditioner",
+        357.0
+      ],
+      [
+        "lg tv",
+        269.0
+      ],
+      [
+        "lg microwave",
+        268.0
+      ]
+    ],
+    "nik": [
+      [
+        "nike",
+        1554.0
+      ],
+      [
+        "nike shoes",
+        736.0
+      ],
+      [
+        "nike keds",
+        445.0
+      ],
+      [
+        "nike costume",
+        393.0
+      ],
+      [
+        "nike costume 2202",
+        0.05949013405765882
+      ]
+    ],
+    "tv": [
+      [
+        "tv",
+        1630.0
+      ]
+    ]
+  },
+  "rango_precio_100_120": [
+    "apple clocks 3414",
+    "nike shoes 2876",
+    "bosch drill 3417",
+    "puma shoes 1917",
+    "jbl acoustic 7071"
+  ],
+  "traza_evento": {
+    "evento": "Event(id=699368, purchase, product=1043473, user=512046490, price=179.07)",
+    "pasos": [
+      "[S0] encolado (cola=4778)",
+      "[S1] válido, normalizado y no duplicado",
+      "[S2] prioridad 2 (compra estándar), posición 161 de 4925 en el lote",
+      "[S3] producto #6210 y usuario #34633 resueltos en la tabla hash",
+      "[S6] pasa el filtro (Bloom: ausente; CMS bajo el umbral)",
+      "[S4] orden indexada por tiempo en el B+Tree",
+      "[S5] vecinos por atributos (KD-Tree): [16702, 7131, 2611]",
+      "[S7] relacionados LSH: []; vecinos IVF: [13897, 8970, 10432]"
+    ],
+    "producto": {
+      "idx": 6210,
+      "product_id": 1043473,
+      "name": "pioneer player 2436",
+      "brand": "pioneer",
+      "category": "auto.accessories.player",
+      "price": 179.07,
+      "views": 30086,
+      "purchases": 835
+    },
+    "recomendaciones": [
+      {
+        "idx": 12334,
+        "product_id": 1086343,
+        "name": "neoline videoregister 8663",
+        "brand": "neoline",
+        "category": "auto.accessories.videoregister",
+        "price": 115.4,
+        "views": 3213,
+        "purchases": 85,
+        "puntaje": 1.188,
+        "fuentes": "grafo"
+      },
+      {
+        "idx": 17764,
+        "product_id": 1124351,
+        "name": "neoline videoregister 9363",
+        "brand": "neoline",
+        "category": "auto.accessories.videoregister",
+        "price": 62.59,
+        "views": 3298,
+        "purchases": 107,
+        "puntaje": 1.09,
+        "fuentes": "grafo"
+      },
+      {
+        "idx": 12413,
+        "product_id": 1086897,
+        "name": "xiaomi videoregister 7100",
+        "brand": "xiaomi",
+        "category": "auto.accessories.videoregister",
+        "price": 40.4,
+        "views": 21,
+        "purchases": 1,
+        "puntaje": 1.004,
+        "fuentes": "IVF"
+      },
+      {
+        "idx": 6359,
+        "product_id": 1044516,
+        "name": "pioneer player 5516",
+        "brand": "pioneer",
+        "category": "auto.accessories.player",
+        "price": 49.96,
+        "views": 37,
+        "purchases": 0,
+        "puntaje": 1.001,
+        "fuentes": "IVF"
+      },
+      {
+        "idx": 8979,
+        "product_id": 1062856,
+        "name": "xiaomi videoregister 3854",
+        "brand": "xiaomi",
+        "category": "auto.accessories.videoregister",
+        "price": 77.96,
+        "views": 1403,
+        "purchases": 38,
+        "puntaje": 0.939,
+        "fuentes": "grafo"
+      }
+    ],
+    "recomendaciones_usuario": [
+      "pioneer player 5516",
+      "xiaomi videoregister 7100",
+      "sony player 7041",
+      "jvc player 3486",
+      "neoline videoregister 9053"
+    ]
+  }
+}
