@@ -1,0 +1,38 @@
+# Dueños por archivo: todo PR que toque estos paths pide review del responsable.
+# Consistente con la tabla de roles del README.
+#
+# Antes de hacer push:
+#   1. Crear el equipo del repo en la org (p. ej. UTEC-AII/grupo2-eda) e invitar a los 4.
+#   2. Reemplazar los @usuario por las cuentas reales de GitHub.
+#   3. Verificar en Settings > Code review > Code owners que no haya errores.
+
+# S0 - S1 - S2 - S9 (Sebastian)
+/src/eda/structures/linked_queue.py   @sebastian
+/src/eda/structures/sorting.py        @sebastian
+/src/eda/structures/heap.py           @sebastian
+/src/eda/structures/trie.py           @sebastian
+/src/eda/service/dashboard.py         @sebastian
+
+# S3 - S4 - S5 (Dante)
+/src/eda/structures/hash_table.py     @dantebarreto-gif
+/src/eda/structures/lru_cache.py      @dantebarreto-gif
+/src/eda/structures/sparse_matrix.py  @dantebarreto-gif
+/src/eda/structures/bplus_tree.py     @dantebarreto-gif
+/src/eda/structures/kd_tree.py        @dantebarreto-gif
+
+# S6 - S8 (Clinton)
+/src/eda/structures/bloom_filter.py     @clinton
+/src/eda/structures/count_min_sketch.py @clinton
+/src/eda/structures/graph.py            @clinton
+
+# S7 + experimentos (Ronald)
+/src/eda/structures/minhash_lsh.py  @ronald
+/src/eda/structures/ann.py          @ronald
+/bench/                             @ronald
+
+# Compartido: lo revisa el grupo completo
+/src/eda/pipeline/     @UTEC-AII/grupo2-eda
+/report/               @UTEC-AII/grupo2-eda
+/notebooks/            @UTEC-AII/grupo2-eda
+/results/              @UTEC-AII/grupo2-eda
+/README.md             @UTEC-AII/grupo2-eda
