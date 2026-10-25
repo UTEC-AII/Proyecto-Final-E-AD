@@ -6,10 +6,11 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[spanish]{babel}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
 \usepackage{graphicx}
 \usepackage{fancyhdr}
 \usepackage{geometry}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage{booktabs}
 \usepackage{listings}
 \usepackage{xcolor}
@@ -29,7 +30,7 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{Pipeline de Data Streams --- Proyecto Final}
+\fancyhead[L]{Pipeline de Data Streams / Proyecto Final}
 \fancyhead[R]{\thepage}
 \renewcommand{\headrulewidth}{0.5pt}
 
@@ -44,6 +45,7 @@
 \lstset{style=mystyle}
 \newcommand{\code}[1]{\texttt{\detokenize{#1}}}
 \graphicspath{{figures/}}
+\hypersetup{pdftitle={Proyecto Final de Estructuras de Datos y Algoritmos},pdfauthor={Grupo 2 UTEC}}
 
 \begin{document}
 
@@ -63,7 +65,7 @@
 \vfill
 {\normalsize\bfseries AUTOR(ES)}\\[0.3cm]
 \begin{tabular}{l}
-Sebastián Rodrigo García Villacorta\\
+Sebastian Rodrigo Garcia Villacorta\\
 Dante Guillermo Barreto Daza\\
 Clinton Michael Chulluncuy Reynoso\\
 Ronald Ramiro Hilario Orihuela
@@ -73,17 +75,16 @@ Ronald Ramiro Hilario Orihuela
 {\normalsize\bfseries CURSO}\\[0.2cm]
 {\normalsize Estructuras de Datos y Algoritmos (MCD8006)}\\[1cm]
 \vfill
-{\normalsize Lima --- Per\'u}\\[0.1cm]
-{\normalsize 2026}
+{\normalsize Lima --- Per\'u, 2026}
 \end{titlepage}
 
 % ============================================================
 \section*{Resumen}
 \addcontentsline{toc}{section}{Resumen}
 
-Se construy\'o un pipeline de diez etapas que procesa de punta a punta 10\,223\,169 eventos de comercio electr\'onico ---los primeros diez millones de octubre de 2019 del dataset REES46 m\'as el componente de stream sint\'etico que exige el enunciado--- a 8\,204 eventos por segundo en Python, con todas las estructuras implementadas desde cero: cola FIFO enlazada, merge sort con b\'usqueda binaria, heap binario, tabla hash, cach\'e LRU, matriz dispersa, B+Tree en disco, KD-Tree, Bloom Filter, Count-Min Sketch, MinHash con LSH, IVF, HNSW, PageRank, Louvain, Label Propagation y Trie. La salida de cada etapa es la entrada real de la siguiente y se verifica con la traza de un evento por las diez etapas y con una prueba de integraci\'on autom\'atica.
+Se construy\'o un pipeline de diez etapas que procesa de punta a punta 10,223,169 eventos de comercio electr\'onico (los primeros diez millones de octubre de 2019 del dataset REES46 y el componente de stream sint\'etico que exige el enunciado) a 8,204 eventos por segundo en Python, con todas las estructuras implementadas desde cero: cola FIFO enlazada, merge sort con b\'usqueda binaria, heap binario, tabla hash, cach\'e LRU, matriz dispersa, B+Tree en disco, KD-Tree, Bloom Filter, Count-Min Sketch, MinHash con LSH, IVF, HNSW, PageRank, Louvain, Label Propagation y Trie. La salida de cada etapa es la entrada real de la siguiente y se verifica con la traza de un evento por las diez etapas y con una prueba de integraci\'on autom\'atica.
 
-Los experimentos de 1K a 10M confirman en escala log-log las complejidades te\'oricas. El B+Tree responde una b\'usqueda sobre 10M claves en 44\,$\mu$s con altura 3; el KD-Tree resuelve KNN 537 veces m\'as r\'apido que la fuerza bruta en tres dimensiones; LSH responde consultas de casi duplicados 295 veces m\'as r\'apido que la comparaci\'on exhaustiva; IVF, 226 veces frente al KNN exacto en 32 dimensiones con \emph{recall}@10 de 0,95; y el Bloom Filter ocupa 12\,MB donde la tabla hash exacta necesita 268\,MB, con una tasa de falsos positivos de 1,01\,\% frente al 1\,\% te\'orico.
+Los experimentos de 1K a 10M confirman en escala log-log las complejidades te\'oricas. El B+Tree responde una b\'usqueda sobre 10M claves en 44 $\mu$s con altura 3; el KD-Tree resuelve KNN 537 veces m\'as r\'apido que la fuerza bruta en tres dimensiones; LSH responde consultas de casi duplicados 295 veces m\'as r\'apido que la comparaci\'on exhaustiva; IVF, 226 veces frente al KNN exacto en 32 dimensiones con \emph{recall}@10 de 0,95; y el Bloom Filter ocupa 12 MB donde la tabla hash exacta necesita 268 MB, con una tasa de falsos positivos de 1,01 \% frente al 1 \% te\'orico.
 
 
 % ============================================================
@@ -98,7 +99,7 @@ El enunciado no eval\'ua implementaciones aisladas sino la integraci\'on verific
 
 \subsection{Dataset real}
 
-Se usa \emph{eCommerce behavior data from multi category store} (REES46, Kaggle), el dataset recomendado por el enunciado para el escenario B: unos 285 millones de eventos de comportamiento de una tienda multicategor\'ia, con las columnas \code{event_time}, \code{event_type}, \code{product_id}, \code{category_id}, \code{category_code}, \code{brand}, \code{price}, \code{user_id} y \code{user_session}. DuckDB lee el archivo \code{2019-Oct.csv} (5,7\,GB) en streaming y toma los primeros diez millones de eventos en orden temporal, del 1 al 8 de octubre de 2019:
+Se usa \emph{eCommerce behavior data from multi category store} (REES46, Kaggle), el dataset recomendado por el enunciado para el escenario B: unos 285 millones de eventos de comportamiento de una tienda multicategor\'ia, con las columnas \code{event_time}, \code{event_type}, \code{product_id}, \code{category_id}, \code{category_code}, \code{brand}, \code{price}, \code{user_id} y \code{user_session}. DuckDB lee el archivo \code{2019-Oct.csv} (5,7 GB) en streaming y toma los primeros diez millones de eventos en orden temporal, del 1 al 8 de octubre de 2019:
 
 \begin{lstlisting}[language=SQL]
 SELECT event_time::TIMESTAMPTZ, event_type, product_id, category_id,
@@ -110,11 +111,11 @@ ORDER BY event_time
 LIMIT 10000000
 \end{lstlisting}
 
-El cat\'alogo se deriva de los mismos eventos (marca, categor\'ia, precio mediano y popularidad), y el grafo de co-compra sale de las sesiones que compraron m\'as de un producto. El embudo queda muy desbalanceado: 95,6\,\% de vistas, 2,2\,\% de carritos y 2,2\,\% de compras, con 120\,565 productos y 1\,072\,341 usuarios.
+El cat\'alogo se deriva de los mismos eventos (marca, categor\'ia, precio mediano y popularidad), y el grafo de co-compra sale de las sesiones que compraron m\'as de un producto. El embudo queda muy desbalanceado: 95,6 \% de vistas, 2,2 \% de carritos y 2,2 \% de compras, con 120,565 productos y 1,072,341 usuarios.
 
 \subsection{Componente de stream sint\'etico}
 
-Ning\'un dataset p\'ublico trae dispositivos, tarjetas, prioridades, fraude ni duplicados, as\'i que ---como pide el enunciado--- se generan con semilla fija sobre la base real. La Tabla~\ref{tab:datos} separa lo real de lo sint\'etico.
+Ning\'un dataset p\'ublico trae dispositivos, tarjetas, prioridades, fraude ni duplicados, as\'i que, como pide el enunciado, se generan con semilla fija sobre la base real. La Tabla~\ref{tab:datos} separa lo real de lo sint\'etico.
 
 \begin{table}[H]
 \centering
@@ -133,12 +134,12 @@ Marcas de tiempo & R\'afagas de fraude y duplicados \\
 \label{tab:datos}
 \end{table}
 
-El enriquecimiento agrega: uno o dos dispositivos por usuario (30\,\% tiene dos), una IP y una tarjeta por usuario, 6\,\% de usuarios premium, tipo de env\'io en las compras (express 15\,\%, est\'andar 70\,\%, programado 15\,\%), consultas de b\'usqueda en 30\,\% de las vistas, 1,5\,\% de eventos reenviados con el mismo \code{event_id} unos segundos despu\'es, y r\'afagas de fraude de 25 a 120 intentos en menos de cinco minutos desde una misma tarjeta, dispositivo e IP. La mitad de las tarjetas fraudulentas se asume ya reportada: esa es la lista negra que carga el Bloom Filter. El total procesado se descompone as\'i: 10\,000\,000 eventos reales, 72\,088 de r\'afagas y 151\,081 duplicados.
+El enriquecimiento agrega: uno o dos dispositivos por usuario (30 \% tiene dos), una IP y una tarjeta por usuario, 6 \% de usuarios premium, tipo de env\'io en las compras (express 15 \%, est\'andar 70 \%, programado 15 \%), consultas de b\'usqueda en 30 \% de las vistas, 1,5 \% de eventos reenviados con el mismo \code{event_id} unos segundos despu\'es, y r\'afagas de fraude de 25 a 120 intentos en menos de cinco minutos desde una misma tarjeta, dispositivo e IP. La mitad de las tarjetas fraudulentas se asume ya reportada: esa es la lista negra que carga el Bloom Filter. El total procesado se descompone as\'i: 10,000,000 eventos reales, 72,088 de r\'afagas y 151,081 duplicados.
 
 % ============================================================
 \section{Arquitectura del pipeline}
 
-El stream se procesa en lotes de 5\,000 eventos. Las etapas incrementales (S0 a S4, S6, S8 y S9) act\'uan sobre cada evento; las estructuras est\'aticas o costosas de construir (KD-Tree, firmas MinHash, SVD con IVF, PageRank y Louvain) se refrescan cada dos millones de eventos y al final. La Figura~\ref{fig:pipeline} muestra el flujo y la Tabla~\ref{tab:etapas} la estructura elegida en cada etapa.
+El stream se procesa en lotes de 5,000 eventos. Las etapas incrementales (S0 a S4, S6, S8 y S9) act\'uan sobre cada evento; las estructuras est\'aticas o costosas de construir (KD-Tree, firmas MinHash, SVD con IVF, PageRank y Louvain) se refrescan cada dos millones de eventos y al final. La Figura~\ref{fig:pipeline} muestra el flujo y la Tabla~\ref{tab:etapas} la estructura elegida en cada etapa.
 
 \begin{figure}[H]
 \centering
@@ -159,7 +160,7 @@ El stream se procesa en lotes de 5\,000 eventos. Las etapas incrementales (S0 a 
 1 & Merge sort + conjunto hash con ventana & Valida, normaliza, ordena por tiempo y deduplica & $O(b\log b)$ por lote; $O(1)$ por evento & Arreglo ordenado: mezcla $O(W)$ por lote \\
 2 & Heap binario (min-heap) & Compras express, premium, est\'andar, programadas, carritos y vistas & push/pop $O(\log n)$; heapify $O(n)$ & Lista ordenada: inserci\'on $O(n)$ \\
 3 & Tabla hash, LRU y matriz dispersa DOK$\to$CSR & Resuelve \code{product_id} y \code{user_id}; cachea fichas; matriz usuario$\times$producto & $O(1)$ amortizado; CSR con $nnz$ & Matriz densa: $200K\times200K$ no cabe \\
-4 & B+Tree con p\'aginas de 4\,KB & \'Indice de precio (carga masiva) e \'indice temporal de \'ordenes & b\'usqueda $O(\log_B n)$; rango $O(\log_B n + k/B)$ & \'Arbol binario: una p\'agina por nodo \\
+4 & B+Tree con p\'aginas de 4 KB & \'Indice de precio (carga masiva) e \'indice temporal de \'ordenes & b\'usqueda $O(\log_B n)$; rango $O(\log_B n + k/B)$ & \'Arbol binario: una p\'agina por nodo \\
 5 & KD-Tree + KNN exacto & Vecinos por precio, popularidad y conversi\'on & construcci\'on $O(n\log n)$; KNN $O(\log n)$ en $d$ bajo & Fuerza bruta $O(n)$ por consulta \\
 6 & Bloom Filter + Count-Min Sketch & Lista negra verificada y conteo de intentos en 10 minutos & $O(k)$ y $O(d)$ por operaci\'on & Conjunto exacto: memoria sin l\'imite \\
 7 & MinHash+LSH, IVF y HNSW & Productos con compradores parecidos y vecinos en embeddings & LSH $O(b\log(nb)+c)$; IVF $O(n_{list}d + n_{probe}\,n/n_{list}\,d)$ & Fuerza bruta $O(n\,d)$ por consulta \\
@@ -178,24 +179,24 @@ El enunciado numera el filtrado probabil\'istico como etapa 6, despu\'es del KD-
 % ============================================================
 \section{Etapas 0 a 5: estructuras base}
 
-\subsection{S0 --- Ingesta con cola FIFO acotada}
+\subsection{S0: Ingesta con cola FIFO acotada}
 Cola enlazada con capacidad de un lote. \code{enqueue} y \code{dequeue} cuestan $O(1)$ y no hay desplazamientos de memoria; cuando la cola est\'a llena, \code{enqueue} devuelve falso, el productor se detiene y el evento se contabiliza como rechazo. La alternativa descartada es la lista de Python con \code{pop(0)}, cuyo costo es $O(n)$ por extracci\'on y $O(n^2)$ en un bucle de ingesta. La prueba \code{test\_linked\_queue\_fifo\_and\_capacity} verifica el orden FIFO y el rechazo al llenarse.
 
-\subsection{S1 --- Preprocesamiento y deduplicaci\'on}
-Se valida el evento (tipo v\'alido, producto, usuario, precio positivo y marca de tiempo), se normaliza texto y precio, y se deduplica en dos niveles: dentro del lote, ordenando por \code{event_id} para que los repetidos queden adyacentes, y contra una ventana deslizante de 500\,000 identificadores. La ventana es un conjunto hash con un anillo de expiraci\'on: comprobar y registrar cuesta $O(1)$ por evento y la memoria queda acotada a la ventana. La alternativa descartada es el arreglo ordenado con b\'usqueda binaria, que obliga a mezclar del orden de $W$ elementos en cada lote ($O(W)$ por lote) frente al $O(1)$ del conjunto hash.
+\subsection{S1: Preprocesamiento y deduplicaci\'on}
+Se valida el evento (tipo v\'alido, producto, usuario, precio positivo y marca de tiempo), se normaliza texto y precio, y se deduplica en dos niveles: dentro del lote, ordenando por \code{event_id} para que los repetidos queden adyacentes, y contra una ventana deslizante de 500,000 identificadores. La ventana es un conjunto hash con un anillo de expiraci\'on: comprobar y registrar cuesta $O(1)$ por evento y la memoria queda acotada a la ventana. La alternativa descartada es el arreglo ordenado con b\'usqueda binaria, que obliga a mezclar del orden de $W$ elementos en cada lote ($O(W)$ por lote) frente al $O(1)$ del conjunto hash.
 
-\subsection{S2 --- Prioridad con heap binario}
+\subsection{S2: Prioridad con heap binario}
 Min-heap sobre arreglo con desempate por secuencia de llegada, de modo que dentro de una misma prioridad el orden es FIFO. Las compras se clasifican en express, premium, est\'andar y programadas; luego carritos y vistas. \code{push} y \code{pop} cuestan $O(\log n)$ y \code{heapify} $O(n)$. La alternativa descartada es mantener una lista ordenada, cuya inserci\'on es $O(n)$.
 
-\subsection{S3 --- Almacenamiento, cach\'e y matriz dispersa}
+\subsection{S3: Almacenamiento, cach\'e y matriz dispersa}
 Tabla hash con sondeo lineal, factor de carga m\'aximo 0,7 y l\'apidas para el borrado, que resuelve \code{product\_id} y \code{user\_id} a \'\i ndices densos en $O(1)$ amortizado. Sobre ella se apoyan la cach\'e LRU (tabla hash m\'as lista doblemente enlazada, $O(1)$ por acceso) y la matriz usuario$\times$producto, que se acumula en formato DOK y se compacta a CSR para el \'algebra matricial. La alternativa descartada es la matriz densa: $200K\times200K$ en doble precisi\'on no cabe en memoria.
 
-\subsection{S4 --- \'Indice principal en disco}
-B+Tree de p\'aginas de 4\,KB con hojas enlazadas y b\'uffer de p\'aginas con escritura diferida. Los datos viven solo en las hojas y las claves internas son separadores, lo que maximiza el abanico y permite recorrer rangos sin volver a subir por el \'arbol. Para 10\,M de claves con 255 entradas por hoja y una ocupaci\'on del 90\,\% resultan 43\,862 hojas, 171 p\'aginas internas y una ra\'iz: altura 3, es decir tres p\'aginas por b\'usqueda y $O(\log_B n + k/B)$ por rango.
+\subsection{S4: \'Indice principal en disco}
+B+Tree de p\'aginas de 4 KB con hojas enlazadas y b\'uffer de p\'aginas con escritura diferida. Los datos viven solo en las hojas y las claves internas son separadores, lo que maximiza el abanico y permite recorrer rangos sin volver a subir por el \'arbol. Para 10 M de claves con 255 entradas por hoja y una ocupaci\'on del 90 \% resultan 43,862 hojas, 171 p\'aginas internas y una ra\'iz: altura 3, es decir tres p\'aginas por b\'usqueda y $O(\log_B n + k/B)$ por rango.
 
-La comparaci\'on con un \'arbol binario es la que justifica la elecci\'on: un nodo AVL ocupa unos 40 bytes y el disco transfiere p\'aginas de 4\,KB, as\'i que leer un nodo desperdicia m\'as del 99\,\% de la p\'agina. Para $10^9$ claves un AVL necesitar\'ia unos 43 accesos a disco (del orden de 430\,ms) mientras que el B+Tree necesita cuatro (unos 40\,ms). El \'indice temporal de \'ordenes se llena con marcas de tiempo crecientes, el patr\'on que la teor\'ia se\~nala como peligroso para un BST: el B+Tree lo absorbe porque se balancea solo, aunque las hojas quedan alrededor del 50\,\% de ocupaci\'on.
+La comparaci\'on con un \'arbol binario es la que justifica la elecci\'on: un nodo AVL ocupa unos 40 bytes y el disco transfiere p\'aginas de 4 KB, as\'i que leer un nodo desperdicia m\'as del 99 \% de la p\'agina. Para $10^9$ claves un AVL necesitar\'ia unos 43 accesos a disco (del orden de 430 ms) mientras que el B+Tree necesita cuatro (unos 40 ms). El \'indice temporal de \'ordenes se llena con marcas de tiempo crecientes, el patr\'on que la teor\'ia se\~nala como peligroso para un BST: el B+Tree lo absorbe porque se balancea solo, aunque las hojas quedan alrededor del 50 \% de ocupaci\'on.
 
-\subsection{S5 --- \'Indice multidimensional y KNN exacto}
+\subsection{S5: \'Indice multidimensional y KNN exacto}
 KD-Tree construido por corte en la mediana del eje m\'as extendido, con hojas de 16 puntos, sobre tres atributos normalizados: logaritmo del precio, logaritmo de las vistas y tasa de conversi\'on. La construcci\'on es $O(n\log n)$ y la consulta $O(\log n)$ en dimensi\'on baja. En 32 dimensiones el \'arbol deja de podar y resulta 421 veces m\'as lento que la fuerza bruta, que es exactamente la maldici\'on de la dimensionalidad: por eso los embeddings se buscan con IVF y no con KD-Tree.
 
 % ============================================================
@@ -206,7 +207,7 @@ KD-Tree construido por corte en la mediana del eje m\'as extendido, con hojas de
 \begin{equation}
 p \approx \left(1-e^{-kn/m}\right)^{k}, \qquad m = -\frac{n\ln p}{(\ln 2)^2}, \qquad k = \frac{m}{n}\ln 2,
 \end{equation}
-de modo que para $p=1$\,\% bastan 9,59 bits por elemento y $k=7$, sin importar el tama\~no de la clave. Las $k$ posiciones se generan con doble hashing $g_i = h_1 + i\,h_2 \bmod m$ (Kirsch y Mitzenmacher, 2006) sobre \code{splitmix64}, y los bits van empaquetados en \code{uint8}. Uso: lista negra de tarjetas y dispositivos. Como un positivo puede ser falso y bloquear una compra es una decisi\'on cr\'itica, todo positivo se verifica contra el conjunto exacto. L\'imites: no admite borrado (s\'i con contadores, \emph{Counting Bloom}) y la tasa crece si se supera la capacidad.
+de modo que para $p=1$ \% bastan 9,59 bits por elemento y $k=7$, sin importar el tama\~no de la clave. Las $k$ posiciones se generan con doble hashing $g_i = h_1 + i\,h_2 \bmod m$ (Kirsch y Mitzenmacher, 2006) sobre \code{splitmix64}, y los bits van empaquetados en \code{uint8}. Uso: lista negra de tarjetas y dispositivos. Como un positivo puede ser falso y bloquear una compra es una decisi\'on cr\'itica, todo positivo se verifica contra el conjunto exacto. L\'imites: no admite borrado (s\'i con contadores, \emph{Counting Bloom}) y la tasa crece si se supera la capacidad.
 
 \textbf{Count-Min Sketch} (Cormode y Muthukrishnan, 2005). Matriz de $d\times w$ contadores con un hash por fila; la estimaci\'on es el m\'inimo de las $d$ celdas. Nunca subestima y, con $w=\lceil e/\varepsilon\rceil$ y $d=\lceil\ln(1/\delta)\rceil$, cumple $\hat{f} \le f + \varepsilon N$ con probabilidad $1-\delta$. La memoria $O(wd)$ no depende del n\'umero de claves. Uso: intentos de compra o carrito por tarjeta y por dispositivo en una ventana de 10 minutos, implementada como anillo de 10 sub-sketches de un minuto que se limpia al avanzar. El umbral es de m\'as de 12 intentos por tarjeta o 20 por dispositivo dentro de la ventana; como solo puede sobreestimar, una alerta puede adelantarse pero nunca ocultarse.
 
@@ -237,7 +238,7 @@ en dos fases repetidas: mover cada nodo a la comunidad vecina con mayor ganancia
 % ============================================================
 \section{Dise\~no de la integraci\'on}
 
-La integraci\'on se verifica con un evento concreto. En la corrida de 10M se traz\'o autom\'aticamente una compra leg\'itima ubicada al 70\,\% del stream; la Figura~\ref{fig:traza} muestra su salida literal. Es la compra de un Samsung de 131,76 USD, el producto con mayor PageRank del grafo. Tiene env\'io programado, as\'i que el heap la deja en la posici\'on 133 de 4\,929, detr\'as de las compras express, premium y est\'andar del lote. LSH no devolvi\'o candidatos porque ning\'un producto supera el umbral de Jaccard de 0,42 con su conjunto de compradores; la recomendaci\'on final combina el grafo de co-compra, el KD-Tree (smartphones de la misma marca y rango de precio) y el IVF, y deja registrada la fuente de cada producto.
+La integraci\'on se verifica con un evento concreto. En la corrida de 10M se traz\'o autom\'aticamente una compra leg\'itima ubicada al 70 \% del stream; la Figura~\ref{fig:traza} muestra su salida literal. Es la compra de un Samsung de 131,76 USD, el producto con mayor PageRank del grafo. Tiene env\'io programado, as\'i que el heap la deja en la posici\'on 133 de 4,929, detr\'as de las compras express, premium y est\'andar del lote. LSH no devolvi\'o candidatos porque ning\'un producto supera el umbral de Jaccard de 0,42 con su conjunto de compradores; la recomendaci\'on final combina el grafo de co-compra, el KD-Tree (smartphones de la misma marca y rango de precio) y el IVF, y deja registrada la fuente de cada producto.
 
 \begin{figure}[H]
 \centering
@@ -265,7 +266,7 @@ Cada flecha de la Figura~\ref{fig:pipeline} corresponde a un dato que la etapa s
 \label{sec:experimentos}
 
 \subsection{Metodolog\'ia}
-Se usan tama\~nos de 1K a 10M con 100 repeticiones para 1K y 10K, 10 para 100K, 3 para 1M y 1 para 10M (con 100 repeticiones la serie de 10M habr\'ia tomado d\'ias en Python puro). Se reporta la media y la desviaci\'on est\'andar, el pico de memoria con \code{tracemalloc} y la pendiente en escala log-log como exponente emp\'irico. Semilla fija 2026; plataforma de 4 vCPU y 16\,GB, Python 3.13 y NumPy 2.5.4 (\code{results/bench/platform.json}). Los experimentos de escalabilidad usan entradas generadas para controlar $n$ y conocer la respuesta exacta; la corrida del pipeline usa los datos reales.
+Se usan tama\~nos de 1K a 10M con 100 repeticiones para 1K y 10K, 10 para 100K, 3 para 1M y 1 para 10M (con 100 repeticiones la serie de 10M habr\'ia tomado d\'ias en Python puro). Se reporta la media y la desviaci\'on est\'andar, el pico de memoria con \code{tracemalloc} y la pendiente en escala log-log como exponente emp\'irico. Semilla fija 2026; plataforma de 4 vCPU y 16 GB, Python 3.13 y NumPy 2.5.4 (\code{results/bench/platform.json}). Los experimentos de escalabilidad usan entradas generadas para controlar $n$ y conocer la respuesta exacta; la corrida del pipeline usa los datos reales.
 
 \subsection{Estructuras base}
 La Figura~\ref{fig:escala} muestra el tiempo total frente a $n$ en escala log-log. Las pendientes medidas siguen la teor\'ia: lineal en la cola y la tabla hash (1,12 y 1,08), $n\log n$ en la ordenaci\'on y el heap (1,21 y 1,22), casi constante en la b\'usqueda del B+Tree (0,32) y en el KNN del KD-Tree en tres dimensiones (0,11), y lineal en todas las l\'ineas base de fuerza bruta (1,02).
@@ -289,10 +290,10 @@ Cola FIFO (enqueue+dequeue) & 13,7 s & 0,69 $\mu$s & 1,12 & 45,8 MB & Lineal, co
 Merge sort & 111 s & 11,1 $\mu$s & 1,21 & 61,5 MB & El factor $\log n$ eleva la pendiente \\
 Heap binario (push+pop) & 181 s & 9,1 $\mu$s & 1,22 & 107,2 MB & $O(n\log n)$ en total \\
 Tabla hash (put+get) & 47,9 s & 2,4 $\mu$s & 1,08 & 48,0 MB & 2,11 sondeos por operaci\'on con carga $\le 0{,}7$ \\
-Cach\'e LRU & 11,2 s & 1,1 $\mu$s & 0,94 & 10,1 MB & 91,5\,\% de aciertos con accesos Zipf \\
-B+Tree: carga / b\'usqueda & 2,0 s / 44,4 $\mu$s & 0,20 / 44,4 $\mu$s & 0,89 / 0,32 & 17,1 MB & Archivo a 1M; a 10M, altura 3 y 43\,862 p\'aginas \\
-KD-Tree: KNN ($k=10$) & 0,73 ms & --- & 0,11 & 71,5 MB & 537 veces m\'as r\'apido que la fuerza bruta (393 ms) \\
-Fuerza bruta: KNN ($k=10$) & 393 ms & --- & 1,02 & 38,2 MB & L\'inea base exacta \\
+Cach\'e LRU & 11,2 s & 1,1 $\mu$s & 0,94 & 10,1 MB & 91,5 \% de aciertos con accesos Zipf \\
+B+Tree: carga / b\'usqueda & 2,0 s / 44,4 $\mu$s & 0,20 / 44,4 $\mu$s & 0,89 / 0,32 & 17,1 MB & Archivo a 1M; a 10M, altura 3 y 43,862 p\'aginas \\
+KD-Tree: KNN ($k=10$) & 0,73 ms & n/d & 0,11 & 71,5 MB & 537 veces m\'as r\'apido que la fuerza bruta (393 ms) \\
+Fuerza bruta: KNN ($k=10$) & 393 ms & n/d & 1,02 & 38,2 MB & L\'inea base exacta \\
 \bottomrule
 \end{tabular}}
 \caption{Estructuras base con $n=10$M. La memoria pico se midi\'o con \code{tracemalloc} a 1M de elementos (su costo crece linealmente con $n$); en el B+Tree se reporta el tama\~no del archivo.}
@@ -300,14 +301,14 @@ Fuerza bruta: KNN ($k=10$) & 393 ms & --- & 1,02 & 38,2 MB & L\'inea base exacta
 \end{table}
 
 \subsection{Filtrado probabil\'istico}
-El Bloom Filter se compar\'o con la tabla hash exacta propia y con el \code{set} de Python. Con 10M elementos el Bloom ($p=1$\,\%) ocupa 12\,MB frente a 268\,MB de la tabla exacta (22 veces menos) y es 4,8 veces m\'as r\'apido en inserci\'on y consulta. La tasa medida de falsos positivos coincide con la te\'orica en los tres valores de $p$ (0,0935\,\% frente a 0,1000\,\% con $p=0{,}1$\,\%; 1,01\,\% frente a 1,00\,\% con $p=1$\,\%), y no hubo un solo falso negativo.
+El Bloom Filter se compar\'o con la tabla hash exacta propia y con el \code{set} de Python. Con 10M elementos el Bloom ($p=1$ \%) ocupa 12 MB frente a 268 MB de la tabla exacta (22 veces menos) y es 4,8 veces m\'as r\'apido en inserci\'on y consulta. La tasa medida de falsos positivos coincide con la te\'orica en los tres valores de $p$ (0,0935 \% frente a 0,1000 \% con $p=0{,}1$ \%; 1,01 \% frente a 1,00 \% con $p=1$ \%), y no hubo un solo falso negativo.
 
 
-Con 10M actualizaciones sobre 1M claves, el Count-Min con $\varepsilon=0{,}001$ usa 53\,KB frente a 16,8\,MB y actualiza 4,6 veces m\'as r\'apido. El error medio (642) y el m\'aximo (4\,146) quedan bajo la cota $\varepsilon N = 9\,997$ en el 100\,\% de las claves, sin subestimar nunca; para las claves frecuentes, que son las que disparan alertas, el error relativo es 4\,\%.
+Con 10M actualizaciones sobre 1M claves, el Count-Min con $\varepsilon=0{,}001$ usa 53 KB frente a 16,8 MB y actualiza 4,6 veces m\'as r\'apido. El error medio (642) y el m\'aximo (4,146) quedan bajo la cota $\varepsilon N = 9,997$ en el 100 \% de las claves, sin subestimar nunca; para las claves frecuentes, que son las que disparan alertas, el error relativo es 4 \%.
 
 \subsection{Similitud y b\'usqueda de vecinos}
 \label{sec:similitud}
-La consulta LSH se mantiene entre 0,6 y 0,8 ms de 1K a 1M conjuntos (pendiente 0,05), mientras la fuerza bruta crece linealmente hasta 225 ms: LSH es 295 veces m\'as r\'apido en 1M. El costo est\'a en la construcci\'on (98\,s para 1M) y en la memoria de las firmas (1,5\,GB), por eso se omiti\'o 10M.
+La consulta LSH se mantiene entre 0,6 y 0,8 ms de 1K a 1M conjuntos (pendiente 0,05), mientras la fuerza bruta crece linealmente hasta 225 ms: LSH es 295 veces m\'as r\'apido en 1M. El costo est\'a en la construcci\'on (98 s para 1M) y en la memoria de las firmas (1,5 GB), por eso se omiti\'o 10M.
 
 Sobre el \emph{recall} conviene reportar las dos lecturas, porque LSH no es un \'indice de vecinos globales. Sobre los vecinos relevantes (Jaccard $\ge 0{,}5$) el recall@10 es 1,0; sobre el top-10 completo es 0,029, con 1,33 candidatos por consulta. Es el comportamiento esperado de un detector de casi duplicados con umbral 0,42: acierta lo que est\'a por encima del umbral y descarta lo que est\'a lejos. Para vecinos en el espacio completo se usa IVF, que s\'i se eval\'ua contra el KNN exacto: con 10M vectores de 32 dimensiones responde en 0,46 ms frente a 104 ms del KNN exacto (226 veces) con recall@10 de 0,95; con $n_{probe}=16$ sube a 0,98 a la mitad de velocidad. En 1M, el barrido de $n_{probe}$ de 1 a 32 recorre la curva de recall de 0,23 a 0,99. HNSW en Python puro lleg\'o a recall 0,97 en 10K pero a 0,80 en 100K con $ef$ de 50 a 100, y su construcci\'on tard\'o 316 s en 100K, por lo que se limit\'o a 100K.
 
@@ -326,16 +327,16 @@ Sobre el \emph{recall} conviene reportar las dos lecturas, porque LSH no es un \
 Sin aproximaci\'on, el KD-Tree en $d=32$ fue 421 veces m\'as lento que la fuerza bruta en 100K, porque en alta dimensi\'on casi no poda ramas: es la evidencia emp\'irica de la maldici\'on de la dimensionalidad.
 
 \subsection{Grafo de co-compra}
-PageRank escala linealmente en aristas (pendiente 1,08) y converge en 47 a 56 iteraciones: 20,7 s para 9,9M aristas. Su correlaci\'on de Spearman con el grado ponderado es 0,99 y el top-100 coincide en 97\,\%, as\'i que en co-compra la diferencia est\'a en la cola: PageRank sube productos conectados con productos centrales.
+PageRank escala linealmente en aristas (pendiente 1,08) y converge en 47 a 56 iteraciones: 20,7 s para 9,9M aristas. Su correlaci\'on de Spearman con el grado ponderado es 0,99 y el top-100 coincide en 97 \%, as\'i que en co-compra la diferencia est\'a en la cola: PageRank sube productos conectados con productos centrales.
 
-En comunidades, sobre grafos con particiones plantadas, Louvain obtiene mayor modularidad que Label Propagation en todos los tama\~nos (0,781 frente a 0,750 con 1M aristas, igual a la partici\'on plantada), es m\'as estable entre semillas (NMI 0,99 frente a 0,94) y recupera mejor la partici\'on real (NMI 0,96 frente a 0,93), aunque tarda 25 s frente a 19 s. Con 10M aristas solo corri\'o LPA (448 s), que se fragment\'o en 104\,606 comunidades con $Q=0,68$; Louvain en Python puro super\'o los 40 minutos y se acot\'o a 1M aristas. En el grafo real de co-compra, que es peque\~no y disperso porque pocas sesiones compran m\'as de un producto (6\,901 productos y 14\,035 aristas), Louvain logr\'o $Q=0,626$ con 1\,005 comunidades frente a $Q=0,394$ de LPA con 1\,608.
+En comunidades, sobre grafos con particiones plantadas, Louvain obtiene mayor modularidad que Label Propagation en todos los tama\~nos (0,781 frente a 0,750 con 1M aristas, igual a la partici\'on plantada), es m\'as estable entre semillas (NMI 0,99 frente a 0,94) y recupera mejor la partici\'on real (NMI 0,96 frente a 0,93), aunque tarda 25 s frente a 19 s. Con 10M aristas solo corri\'o LPA (448 s), que se fragment\'o en 104,606 comunidades con $Q=0,68$; Louvain en Python puro super\'o los 40 minutos y se acot\'o a 1M aristas. En el grafo real de co-compra, que es peque\~no y disperso porque pocas sesiones compran m\'as de un producto (6,901 productos y 14,035 aristas), Louvain logr\'o $Q=0,626$ con 1,005 comunidades frente a $Q=0,394$ de LPA con 1,608.
 
 
 % ============================================================
 \section{Corrida completa y correcciones de la versi\'on final}
 
 \subsection{Corrida de referencia con 10M de eventos}
-La Tabla~\ref{tab:corrida} resume la corrida de punta a punta sobre los 10\,223\,169 eventos. El total fue de 1\,246\,s (8\,204 eventos por segundo). Se eliminaron los 151\,081 duplicados inyectados sin falsos positivos, se indexaron 178\,145 \'ordenes en el B+Tree en disco y la matriz usuario$\times$producto acumul\'o 5,8 millones de celdas no nulas. El refresco de S7 concentra el 55\,\% del tiempo (SVD y k-means sobre la matriz completa); refrescar con menor frecuencia o en paralelo es la mejora m\'as directa.
+La Tabla~\ref{tab:corrida} resume la corrida de punta a punta sobre los 10,223,169 eventos. El total fue de 1,246 s (8,204 eventos por segundo). Se eliminaron los 151,081 duplicados inyectados sin falsos positivos, se indexaron 178,145 \'ordenes en el B+Tree en disco y la matriz usuario$\times$producto acumul\'o 5,8 millones de celdas no nulas. El refresco de S7 concentra el 55 \% del tiempo (SVD y k-means sobre la matriz completa); refrescar con menor frecuencia o en paralelo es la mejora m\'as directa.
 
 \begin{table}[H]
 \centering
@@ -350,7 +351,7 @@ S2 prioridad & 78,6 & S7 refresco LSH + SVD + IVF & 680,1 \\
 S3 almacenamiento e interacciones & 83,9 & S8 grafo y refrescos & 3,7 \\
 S6 filtrado & 50,3 & S9 servicio & 6,7 \\
 \midrule
-\multicolumn{3}{@{}l}{\textbf{Total} (10\,223\,169 eventos)} & \textbf{1\,246,2} \\
+\multicolumn{3}{@{}l}{\textbf{Total} (10,223,169 eventos)} & \textbf{1,246,2} \\
 \bottomrule
 \end{tabular}
 \caption{Tiempo por etapa en la corrida de referencia con los 10M eventos reales.}
@@ -375,7 +376,7 @@ La revisi\'on del c\'odigo y del informe identific\'o seis defectos que se corri
 Adem\'as se corrigieron tres problemas de documentaci\'on: la Tabla de estructuras base se hab\'ia partido en dos p\'aginas y este informe la rehace en una sola; la secci\'on de las etapas 0 a 5 pas\'o de tres l\'ineas a una subsecci\'on por etapa con funci\'on, complejidad y alternativa; y el \emph{recall} de LSH se reporta ahora con sus dos lecturas (global y sobre vecinos relevantes) en lugar de solo la favorable.
 
 \subsection{Validaci\'on de las correcciones}
-Las correcciones se validaron con una corrida completa de la versi\'on final sobre un mill\'on de eventos sint\'eticos (1\,022\,378 tras inyectar r\'afagas y duplicados), en 27,37\,s y 37\,358 eventos por segundo. Los 15\,109 duplicados se eliminaron todos. El filtro bloque\'o 5\,974 eventos con precisi\'on de 100\,\% y \emph{recall} de 82,12\,\%: el \emph{recall} baja respecto de la versi\'on anterior porque ya no se sostiene con una marca permanente, que es precisamente el sesgo que se corrigi\'o. Las alertas se repartieron en 3\,433 por lista negra y 2\,541 por frecuencia de tarjeta. El B+Tree qued\'o con altura 2, 90 p\'aginas en el \'indice de precio y 202 en el de \'ordenes (dos p\'aginas por b\'usqueda), y el grafo con 6\,368 nodos y 23\,690 aristas, con Louvain en $Q=0,914$ frente a $Q=0,853$ de LPA.
+Las correcciones se validaron con una corrida completa de la versi\'on final sobre un mill\'on de eventos sint\'eticos (1,022,378 tras inyectar r\'afagas y duplicados), en 27,37 s y 37,358 eventos por segundo. Los 15,109 duplicados se eliminaron todos. El filtro bloque\'o 5,974 eventos con precisi\'on de 100 \% y \emph{recall} de 82,12 \%: el \emph{recall} baja respecto de la versi\'on anterior porque ya no se sostiene con una marca permanente, que es precisamente el sesgo que se corrigi\'o. Las alertas se repartieron en 3,433 por lista negra y 2,541 por frecuencia de tarjeta. El B+Tree qued\'o con altura 2, 90 p\'aginas en el \'indice de precio y 202 en el de \'ordenes (dos p\'aginas por b\'usqueda), y el grafo con 6,368 nodos y 23,690 aristas, con Louvain en $Q=0,914$ frente a $Q=0,853$ de LPA.
 
 La corrida de 10M con la versi\'on final requiere el archivo \code{2019-Oct.csv} de REES46 y se reproduce con \code{scripts/reproduce.sh}; tarda alrededor de 21 minutos en la plataforma descrita.
 
@@ -384,7 +385,7 @@ La corrida de 10M con la versi\'on final requiere el archivo \code{2019-Oct.csv}
 
 Python puro limita las repeticiones en 10M y deja fuera Louvain sobre 10M aristas y MinHash sobre 10M conjuntos. El KD-Tree pierde su ventaja en 32 dimensiones, lo que se reporta como hallazgo y no como fallo: en el pipeline se usa en tres dimensiones y los embeddings se buscan con IVF. En los datos reales el umbral fijo del Count-Min confunde a los usuarios de muy alta frecuencia con fraude: hay 309 cuentas con m\'as de 12 carritos o compras en diez minutos, hasta 110, un patr\'on de bot o revendedor que la etiqueta sint\'etica no marca. En producci\'on esas alertas ir\'ian a revisi\'on manual en lugar de bloquearse.
 
-Como trabajo futuro: procesar octubre y noviembre completos (110M eventos), calibrar el umbral por usuario, paralelizar el refresco de S7 que concentra el 55\,\% del tiempo, comparar Leiden con Louvain y usar Counting Bloom para poder retirar tarjetas de la lista negra.
+Como trabajo futuro: procesar octubre y noviembre completos (110M eventos), calibrar el umbral por usuario, paralelizar el refresco de S7 que concentra el 55 \% del tiempo, comparar Leiden con Louvain y usar Counting Bloom para poder retirar tarjetas de la lista negra.
 
 % ============================================================
 \section{Conclusiones}
@@ -401,16 +402,16 @@ Como trabajo futuro: procesar octubre y noviembre completos (110M eventos), cali
 \addcontentsline{toc}{section}{Referencias}
 {\small
 \begin{itemize}[leftmargin=1.2em,itemsep=1pt]
-\item Bloom, B. H. (1970). Space/time trade-offs in hash coding with allowable errors. \emph{Communications of the ACM}, 13(7), 422--426.
+\item Bloom, B. H. (1970). Space/time trade-offs in hash coding with allowable errors. \emph{Communications of the ACM}, 13(7), 422-426.
 \item Blondel, V. D., Guillaume, J.-L., Lambiotte, R., \& Lefebvre, E. (2008). Fast unfolding of communities in large networks. \emph{J. Stat. Mech.}, P10008.
-\item Brin, S., \& Page, L. (1998). The anatomy of a large-scale hypertextual Web search engine. \emph{Computer Networks and ISDN Systems}, 30(1--7), 107--117.
-\item Broder, A. Z. (1997). On the resemblance and containment of documents. \emph{Compression and Complexity of Sequences}, 21--29.
-\item Cormode, G., \& Muthukrishnan, S. (2005). An improved data stream summary: The Count-Min sketch and its applications. \emph{Journal of Algorithms}, 55(1), 58--75.
-\item Halko, N., Martinsson, P. G., \& Tropp, J. A. (2011). Finding structure with randomness. \emph{SIAM Review}, 53(2), 217--288.
-\item Indyk, P., \& Motwani, R. (1998). Approximate nearest neighbors: Toward removing the curse of dimensionality. \emph{STOC '98}, 604--613.
-\item J\'egou, H., Douze, M., \& Schmid, C. (2011). Product quantization for nearest neighbor search. \emph{IEEE TPAMI}, 33(1), 117--128.
-\item Kirsch, A., \& Mitzenmacher, M. (2006). Less hashing, same performance: Building a better Bloom filter. \emph{ESA 2006}, 456--467.
-\item Malkov, Y. A., \& Yashunin, D. A. (2020). Efficient and robust approximate nearest neighbor search using hierarchical navigable small world graphs. \emph{IEEE TPAMI}, 42(4), 824--836.
+\item Brin, S., \& Page, L. (1998). The anatomy of a large-scale hypertextual Web search engine. \emph{Computer Networks and ISDN Systems}, 30(1-7), 107-117.
+\item Broder, A. Z. (1997). On the resemblance and containment of documents. \emph{Compression and Complexity of Sequences}, 21-29.
+\item Cormode, G., \& Muthukrishnan, S. (2005). An improved data stream summary: The Count-Min sketch and its applications. \emph{Journal of Algorithms}, 55(1), 58-75.
+\item Halko, N., Martinsson, P. G., \& Tropp, J. A. (2011). Finding structure with randomness. \emph{SIAM Review}, 53(2), 217-288.
+\item Indyk, P., \& Motwani, R. (1998). Approximate nearest neighbors: Toward removing the curse of dimensionality. \emph{STOC '98}, 604-613.
+\item J\'egou, H., Douze, M., \& Schmid, C. (2011). Product quantization for nearest neighbor search. \emph{IEEE TPAMI}, 33(1), 117-128.
+\item Kirsch, A., \& Mitzenmacher, M. (2006). Less hashing, same performance: Building a better Bloom filter. \emph{ESA 2006}, 456-467.
+\item Malkov, Y. A., \& Yashunin, D. A. (2020). Efficient and robust approximate nearest neighbor search using hierarchical navigable small world graphs. \emph{IEEE TPAMI}, 42(4), 824-836.
 \item Raghavan, U. N., Albert, R., \& Kumara, S. (2007). Near linear time algorithm to detect community structures in large-scale networks. \emph{Physical Review E}, 76(3), 036106.
 \item Traag, V. A., Waltman, L., \& van Eck, N. J. (2019). From Louvain to Leiden. \emph{Scientific Reports}, 9, 5233.
 \end{itemize}}
