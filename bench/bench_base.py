@@ -35,8 +35,9 @@ def run(sizes) -> None:
         # S1 merge sort (Python puro) sobre n claves
         r = max(1, reps // 10) if n >= 100_000 else reps
         m, s = timeit(lambda: merge_sort(keys), r)
+        cur, peak, _ = memory(lambda: merge_sort(keys))
         rec.add(structure="MergeSort", op="sort", n=n, reps=r, mean_s=m, std_s=s, per_op_us=m / n * 1e6,
-                expected="O(n log n)")
+                mem_current_B=cur, mem_peak_B=peak, expected="O(n log n)")
 
         # S2 heap: n push + n pop
         def heap():
@@ -46,8 +47,9 @@ def run(sizes) -> None:
             while len(h):
                 h.pop()
         m, s = timeit(heap, reps)
+        cur, peak, _ = memory(lambda: _fill_heap(keys))
         rec.add(structure="BinaryHeap", op="push+pop", n=n, reps=reps, mean_s=m, std_s=s,
-                per_op_us=m / (2 * n) * 1e6, expected="O(log n)")
+                per_op_us=m / (2 * n) * 1e6, mem_current_B=cur, mem_peak_B=peak, expected="O(log n)")
 
         # S3 tabla hash: n put + n get
         def hashtable():
@@ -74,8 +76,9 @@ def run(sizes) -> None:
             return c
         m, s = timeit(lru, reps)
         c = lru()
+        cur, peak, _ = memory(lru)
         rec.add(structure="LRUCache", op="get/put", n=n, reps=reps, mean_s=m, std_s=s, per_op_us=m / n * 1e6,
-                expected="O(1)", extra=f"hit_rate={c.hit_rate:.3f}")
+                mem_current_B=cur, mem_peak_B=peak, expected="O(1)", extra=f"hit_rate={c.hit_rate:.3f}")
 
         # S4 B+Tree en disco: carga masiva + 1000 búsquedas + inserciones aleatorias (hasta 1M)
         sk = np.unique(np.array(keys, dtype=np.int64) >> 1)
@@ -93,7 +96,8 @@ def run(sizes) -> None:
             t = BPlusTree(path, create=False, cache_pages=64)
             m, s = timeit(lambda: [t.search(x) for x in q], min(reps, 20))
             rec.add(structure="BPlusTree", op="search(1000)", n=n, reps=min(reps, 20), mean_s=m, std_s=s,
-                    per_op_us=m / 1000 * 1e6, expected="O(log_B n)",
+                    per_op_us=m / 1000 * 1e6, mem_current_B=t.file_size(), mem_peak_B=t.file_size(),
+                    expected="O(log_B n)",
                     extra=f"height={t.height};pages={t.n_pages};file_MB={t.file_size() / 2**20:.1f}")
             lo = int(np.quantile(sk, 0.5))
             m, s = timeit(lambda: list(t.range_search(lo, lo + (1 << 61) // 1000)), min(reps, 20))
@@ -126,8 +130,9 @@ def run(sizes) -> None:
         rec.add(structure="KDTree", op="knn10(100 consultas)", n=n, reps=min(reps, 10), mean_s=m, std_s=s,
                 per_op_us=m / 100 * 1e6, expected="O(log n)")
         m, s = timeit(lambda: [knn_brute_force(pts, x, 10) for x in qs], min(reps, 10))
+        cur, peak, _ = memory(lambda: [knn_brute_force(pts, x, 10) for x in qs])
         rec.add(structure="KNN fuerza bruta", op="knn10(100 consultas)", n=n, reps=min(reps, 10), mean_s=m,
-                std_s=s, per_op_us=m / 100 * 1e6, expected="O(n)")
+                std_s=s, per_op_us=m / 100 * 1e6, mem_current_B=cur, mem_peak_B=peak, expected="O(n)")
         del pts, tree, keys, zipf
 
 
@@ -143,3 +148,10 @@ def _fill_hash(keys):
     for k in keys:
         t.put(k, 1)
     return t
+
+
+def _fill_heap(keys):
+    h = BinaryHeap()
+    for k in keys:
+        h.push(k, None)
+    return h
