@@ -2,6 +2,8 @@
 
 **UTEC · Maestría en Ciencia de Datos e IA · Estructuras de Datos y Algoritmos · Prof. Heider Sánchez**
 
+**Repositorio:** https://github.com/UTEC-AII/Proyecto-Final-E-AD
+
 Pipeline de 10 etapas que procesa un stream de eventos de una tienda en línea (escenario B) con estructuras de datos implementadas desde cero: cada etapa usa la estructura adecuada y su salida alimenta a la siguiente. Un evento entra por una cola FIFO, se limpia, se prioriza, se resuelve en tablas hash, pasa un filtro de fraude probabilístico y termina actualizando índices, similitud, el grafo de co-compra y el servicio de recomendaciones.
 
 ![Pipeline](docs/pipeline.png)
@@ -30,7 +32,7 @@ python scripts/prepare_data.py --source rees46 --events 10000000   # 10M eventos
 python scripts/prepare_data.py --events 200000                     # sintético, ~3 s, sin descarga
 
 # 2. Pipeline de punta a punta: imprime el recorrido de un evento por las 10 etapas
-python scripts/run_pipeline.py --data data/synthetic_200000
+python scripts/run_pipeline.py --data data/synthetic_200000 --refresh 50000
 
 # 3. Panel (etapa 9): demo en vivo, autocompletado, recomendaciones y rangos de precio
 streamlit run src/eda/service/dashboard.py -- --data data/synthetic_200000
@@ -39,10 +41,11 @@ streamlit run src/eda/service/dashboard.py -- --data data/synthetic_200000
 pytest
 python bench/run_benchmarks.py --quick     # 1K a 100K, minutos
 python bench/run_benchmarks.py             # 1K a 10M, horas en Python puro
+./scripts/reproduce.sh                     # todo: datos, pipeline 10M, figuras e informe
 python bench/plots.py                      # figuras log-log en report/figures/
 
 # 5. Informe PDF (LaTeX, requiere pdflatex)
-python scripts/build_report.py --group Grupo2
+cd report && pdflatex -interaction=nonstopmode Proyecto_Final_Grupo2.tex
 
 # 6. Diapositivas (Node.js): lee las cifras de results/
 npm install pptxgenjs react react-dom react-icons sharp
@@ -61,7 +64,7 @@ DuckDB lee los CSV en streaming y toma los primeros 10M eventos en orden tempora
 ## Arquitectura
 
 | Etapa | Estructura (archivo) | Qué hace | Qué entrega |
-|---|---|---|---|
+|---|---|---|---|---|
 | S0 Ingesta | Cola FIFO enlazada ([`linked_queue.py`](src/eda/structures/linked_queue.py)) | Buffer con capacidad entre el lector y el consumidor por lotes | Lotes de eventos |
 | S1 Preprocesamiento | Merge sort + búsqueda binaria ([`sorting.py`](src/eda/structures/sorting.py)) | Valida, normaliza, elimina duplicados contra una ventana de 500K ids y ordena por tiempo | Eventos limpios |
 | S2 Prioridad | Heap binario ([`heap.py`](src/eda/structures/heap.py)) | Compras express, premium, estándar, programadas, carritos, vistas | Eventos en orden de urgencia |
@@ -107,12 +110,12 @@ Las pendientes log-log medidas están en [`results/bench/slopes.csv`](results/be
 
 Cada integrante es responsable principal de al menos dos etapas o una familia de algoritmos, la expone en la presentación y responde por ella en la sustentación.
 
-| Integrante | Responsable principal de | Familias del bloque avanzado |
-|---|---|---|
-| Sebastian Rodrigo Garcia Villacorta | S0 Ingesta, S1 Preprocesamiento, S2 Prioridad, S9 Servicio y panel | — |
-| Dante Guillermo Barreto Daza | S3 Almacenamiento (hash, LRU, matriz dispersa), S4 B+Tree, S5 KD-Tree | — |
-| Clinton Michael Chulluncuy Reynoso | S6 Filtrado, S8 Grafo | Filtrado probabilístico, ranking de influencia, comunidades |
-| Ronald Ramiro Hilario Orihuela | S7 Similitud, experimentos | Similitud de conjuntos, ANN vectorial |
+| Integrante | Responsable principal de | Familia del bloque avanzado | Aporte concreto en la entrega final |
+|---|---|---|---|
+| Sebastian Rodrigo Garcia Villacorta | S0 Ingesta, S1 Preprocesamiento, S2 Prioridad, S9 Servicio y panel | — | Deduplicación con conjunto hash y ventana circular, cola acotada con contador de rechazos, panel y trazas |
+| Dante Guillermo Barreto Daza | S3 Almacenamiento (hash, LRU, matriz dispersa), S4 B+Tree, S5 KD-Tree | — | Matriz y grafo con pares (fila, columna) y (u, v), métricas de altura y páginas del B+Tree |
+| Clinton Michael Chulluncuy Reynoso | S6 Filtrado, S8 Grafo | Filtrado probabilístico, ranking, comunidades | Ventana móvil de S6 sin marcas permanentes, PageRank y Louvain frente a Label Propagation |
+| Ronald Ramiro Hilario Orihuela | S7 Similitud, experimentos | Similitud de conjuntos, ANN | Recall de LSH con sus dos lecturas, IVF frente a KNN exacto y memoria pico del benchmark |
 
 Cada integrante revisa, prueba y responde por las etapas a su cargo; el historial de commits y los pull requests documentan esa contribución.
 
@@ -130,3 +133,30 @@ notebooks/            análisis de resultados
 report/               informe, figuras y diapositivas
 results/              CSV de experimentos y resumen de la corrida de 10M
 ```
+
+
+## Correcciones de la versión final
+
+La revisión del proyecto corrigió seis defectos; el detalle está en la sección 8 del informe.
+
+| Etapa | Antes | Ahora |
+|---|---|---|
+| S6 | La tarjeta quedaba bloqueada para siempre tras cruzar el umbral | El umbral se evalúa sobre la ventana móvil y la tarjeta se desbloquea sola |
+| S1 | Arreglo ordenado con mezcla de 500K ids por lote | Conjunto hash con anillo de expiración, O(1) por evento |
+| S0 | Cola de 4×lote: el backpressure nunca se ejercía | Capacidad de un lote y contador de rechazos |
+| S3 | Celda codificada como `fila*ncols+col`, se corrompía al crecer el catálogo | La celda es el par (fila, columna) |
+| S5/S8 | Arista codificada como `a*n+b` con dimensión variable | La arista es el par (u, v) |
+| Bench | Solo 2 de 8 estructuras medían memoria | `tracemalloc` para todas; el B+Tree reporta el archivo |
+
+## Colaboración
+
+El repositorio está preparado para que cada integrante suba su parte con un pull request:
+
+| Rama | Responsable | Contenido |
+|---|---|---|
+| `feat/s1-ingesta-dedup` | Sebastián | S1 con conjunto hash y S0 con cola acotada |
+| `fix/s3-matriz-grafo` | Dante | Matriz y grafo con pares; métricas del B+Tree |
+| `fix/s6-ventana` | Clinton | Ventana móvil sin marcas permanentes |
+| `feat/s7-experimentos` | Ronald | Memoria pico de todas las estructuras |
+
+La versión integrada está en la rama `solucion`. El procedimiento para publicar las ramas y abrir los PR se describe en [`docs/COLABORACION.md`](docs/COLABORACION.md).
