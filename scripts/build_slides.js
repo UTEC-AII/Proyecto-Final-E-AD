@@ -423,7 +423,7 @@ async function main() {
     s.addText(d, { x: x + 0.8, y: y + 0.65, w: 5.0, h: 1.4, fontSize: 14, color: C.accent6, margin: 0, valign: "top",
       isTextBox: true });
   });
-  s.addText("github.com/dantebarreto-gif/Proyecto-Final-E-AD", { x: 0.6, y: 6.8, w: 8, h: 0.4, fontSize: 12,
+  s.addText("github.com/UTEC-AII/Proyecto-Final-E-AD", { x: 0.6, y: 6.8, w: 8, h: 0.4, fontSize: 12,
     color: C.accent6, margin: 0, isTextBox: true });
   s.addNotes("Presenta: Clinton. Cerramos con cuatro ideas: la integración es observable de punta a punta, las estructuras probabilísticas ganan en memoria y tiempo con error controlado, las mediciones confirman la complejidad teórica, y el siguiente paso es procesar los dos meses completos y paralelizar el refresco de similitud. Gracias, quedamos atentos a sus preguntas.");
 
