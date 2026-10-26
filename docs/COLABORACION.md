@@ -19,8 +19,8 @@ seis mergeados y uno reemplazado por su repetición.
 **S1 terminó con búsqueda binaria, no con conjunto hash.** El PR #1 introdujo una
 deduplicación con conjunto hash, pero la etapa 1 del enunciado pide ordenación y
 búsqueda binaria. El PR #7 la reemplazó por un anillo de corridas ordenadas con
-búsqueda binaria vectorizada, que es lo que describen el informe, las láminas y
-el guion. El resultado es el mismo: los 151,081 duplicados se eliminan igual.
+búsqueda binaria vectorizada, que es lo que describen el informe y las láminas.
+El resultado es el mismo: los 151,081 duplicados se eliminan igual.
 
 **El PR #6 quedó cerrado sin mergear** porque Dante abrió dos veces el mismo
 cambio; el #7 es el que entró a `main`. No hay pérdida de contenido.
