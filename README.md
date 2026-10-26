@@ -90,6 +90,14 @@ DuckDB lee los CSV en streaming y toma los primeros 10M eventos en orden tempora
 
 El orquestador está en [`src/eda/pipeline/`](src/eda/pipeline). S6 corre justo después de S3 para que lo bloqueado no contamine índices, similitud ni grafo. Las librerías externas (NetworkX, SciPy) solo se usan en los tests para validar resultados.
 
+## Demo
+
+![Panel de la etapa 9](docs/capturas/panel_demo.png)
+
+El panel corre sobre 200 mil eventos sintéticos y muestra la traza de un evento por
+las diez etapas, las alertas ordenadas por severidad, el Top-K de ventas, el
+autocompletado del Trie y las consultas por rango de precio sobre el B+Tree.
+
 ## Resultados principales
 
 Corrida de punta a punta con **10,223,169 eventos reales de REES46** (1 al 8 de octubre de 2019, más el componente de stream) en 4 vCPU con Python 3.13. Es la corrida de referencia: las correcciones de S0, S1 y S6 se detallan más abajo. El resumen está en [`results/demo/summary_10M.json`](results/demo/summary_10M.json) y el log en [`results/demo/run_10M_rees46.log`](results/demo/run_10M_rees46.log):
