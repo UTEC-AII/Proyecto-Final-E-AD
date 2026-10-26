@@ -1,8 +1,11 @@
 {
   "eventos_recibidos": 10223169,
-  "eventos_que_pasan_el_filtro": 10001406,
-  "segundos": 1246.18,
-  "eventos_por_segundo": 8204,
+  "eventos_que_pasan_el_filtro": 10005460,
+  "segundos": 308.79,
+  "eventos_por_segundo": 33107,
+  "S0": {
+    "rechazados_por_cola_llena": 0
+  },
   "S1": {
     "invalidos": 0,
     "duplicados_eliminados": 151081,
@@ -19,62 +22,71 @@
   "S3": {
     "productos": 120565,
     "usuarios": 1072341,
-    "interacciones_nnz": 5808668,
+    "interacciones_nnz": 5808669,
     "productos_nuevos_en_stream": 0
   },
   "S4": {
-    "altura_indice_precio": 3,
+    "ordenes_indexadas": 179043,
+    "altura_precio": 3,
     "paginas_precio": 532,
-    "ordenes_indexadas": 178145,
-    "altura_indice_ordenes": 3,
+    "altura_ordenes": 3,
+    "paginas_ordenes": 1410,
     "lecturas_disco": 1,
-    "escrituras_disco": 911
+    "escrituras_disco": 918,
+    "paginas_por_busqueda": 3,
+    "paginas_por_rango": 4
   },
   "S6": {
-    "blocked": 70682,
-    "precision": 0.9294587023570358,
-    "recall": 0.9113305959382977,
+    "blocked": 66628,
+    "precision": 0.9535930839887135,
+    "recall": 0.8813672178448563,
     "bloom_positives": 34434,
     "bloom_false_positives": 7,
     "bloom_memory_bytes": 3401,
-    "cms_memory_bytes": 2174800
+    "cms_memory_bytes": 2174800,
+    "alerts_blacklist": 34427,
+    "alerts_card": 32201,
+    "alerts_device": 0,
+    "card_threshold": 12,
+    "device_threshold": 20,
+    "window_seconds": 600
   },
   "S8": {
-    "nodes_with_edges": 6901,
-    "edges": 14035,
+    "nodes_with_edges": 6921,
+    "edges": 14176,
     "pagerank_iters": 89,
-    "pagerank_s": 0.1255206410005485,
-    "louvain_s": 0.16115500900014013,
-    "louvain_Q": 0.6257845916508422,
+    "pagerank_s": 0.02756483299890533,
+    "louvain_s": 0.07190004200674593,
+    "louvain_Q": 0.6214945187890579,
     "louvain_k": 1005,
-    "lpa_s": 0.1751183319993288,
-    "lpa_Q": 0.39381996594527424,
-    "lpa_k": 1608,
+    "lpa_s": 0.06361250000190921,
+    "lpa_Q": 0.3829046037678253,
+    "lpa_k": 1621,
     "top20_overlap_pagerank_vs_degree": 0.9,
     "largest_communities": [
-      642,
-      559,
-      525,
-      453,
-      265
+      573,
+      549,
+      382,
+      364,
+      323
     ]
   },
   "tiempos_por_etapa_s": {
-    "setup": 2.754,
-    "S0 ingesta": 258.545,
-    "S1 preprocesamiento": 69.493,
-    "S2 prioridad": 78.597,
-    "S3 almacenamiento": 37.972,
-    "S6 filtrado": 50.259,
-    "S3 interacciones": 45.88,
-    "S4 B+Tree": 3.8,
-    "S5 KD-Tree": 0.432,
-    "S7 similitud": 0.216,
-    "S8 grafo": 1.495,
-    "S9 servicio": 6.685,
-    "S5 refresco KD-Tree": 2.598,
-    "S7 refresco LSH+IVF": 680.059,
-    "S8 refresco PageRank+Louvain": 2.217
+    "setup": 0.392,
+    "S0 ingesta": 58.154,
+    "S1 preprocesamiento": 29.489,
+    "S2 prioridad": 20.09,
+    "S3 almacenamiento": 10.956,
+    "S6 filtrado": 18.74,
+    "S3 interacciones": 13.693,
+    "S4 B+Tree": 0.821,
+    "S5 KD-Tree": 0.051,
+    "S7 similitud": 0.044,
+    "S8 grafo": 0.386,
+    "S9 servicio": 1.797,
+    "S5 refresco KD-Tree": 0.617,
+    "S7 refresco LSH+IVF": 151.02,
+    "S8 refresco PageRank+Louvain": 0.658
   },
   "top_ventas": [
     {
@@ -85,8 +97,8 @@
       "category": "electronics.smartphone",
       "price": 131.76,
       "views": 99972,
-      "purchases": 6760,
-      "ventas": 6760
+      "purchases": 6810,
+      "ventas": 6810
     },
     {
       "idx": 786,
@@ -96,8 +108,8 @@
       "category": "electronics.smartphone",
       "price": 252.63,
       "views": 82294,
-      "purchases": 4872,
-      "ventas": 4872
+      "purchases": 4890,
+      "ventas": 4890
     },
     {
       "idx": 1059,
@@ -107,8 +119,8 @@
       "category": "electronics.smartphone",
       "price": 975.56,
       "views": 92963,
-      "purchases": 3055,
-      "ventas": 3055
+      "purchases": 3077,
+      "ventas": 3077
     },
     {
       "idx": 14608,
@@ -129,8 +141,8 @@
       "category": "electronics.smartphone",
       "price": 173.98,
       "views": 42043,
-      "purchases": 2788,
-      "ventas": 2788
+      "purchases": 2802,
+      "ventas": 2802
     },
     {
       "idx": 871,
@@ -140,8 +152,8 @@
       "category": "electronics.smartphone",
       "price": 289.51,
       "views": 48045,
-      "purchases": 2614,
-      "ventas": 2614
+      "purchases": 2629,
+      "ventas": 2629
     },
     {
       "idx": 32,
@@ -151,8 +163,8 @@
       "category": "electronics.smartphone",
       "price": 462.39,
       "views": 43407,
-      "purchases": 2438,
-      "ventas": 2438
+      "purchases": 2521,
+      "ventas": 2521
     },
     {
       "idx": 493,
@@ -162,8 +174,8 @@
       "category": "electronics.smartphone",
       "price": 730.53,
       "views": 52947,
-      "purchases": 2084,
-      "ventas": 2084
+      "purchases": 2091,
+      "ventas": 2091
     },
     {
       "idx": 15892,
@@ -173,8 +185,8 @@
       "category": "unknown",
       "price": 28.78,
       "views": 43583,
-      "purchases": 1855,
-      "ventas": 1855
+      "purchases": 1858,
+      "ventas": 1858
     },
     {
       "idx": 18,
@@ -184,8 +196,8 @@
       "category": "electronics.smartphone",
       "price": 512.21,
       "views": 31738,
-      "purchases": 1722,
-      "ventas": 1722
+      "purchases": 1744,
+      "ventas": 1744
     }
   ],
   "top_pagerank": [
@@ -197,8 +209,8 @@
       "category": "electronics.smartphone",
       "price": 131.76,
       "views": 99972,
-      "purchases": 6760,
-      "pagerank": 0.004133
+      "purchases": 6810,
+      "pagerank": 0.004152
     },
     {
       "idx": 786,
@@ -208,8 +220,8 @@
       "category": "electronics.smartphone",
       "price": 252.63,
       "views": 82294,
-      "purchases": 4872,
-      "pagerank": 0.003214
+      "purchases": 4890,
+      "pagerank": 0.003216
     },
     {
       "idx": 840,
@@ -219,8 +231,8 @@
       "category": "electronics.smartphone",
       "price": 173.98,
       "views": 42043,
-      "purchases": 2788,
-      "pagerank": 0.002054
+      "purchases": 2802,
+      "pagerank": 0.002049
     },
     {
       "idx": 1059,
@@ -230,8 +242,8 @@
       "category": "electronics.smartphone",
       "price": 975.56,
       "views": 92963,
-      "purchases": 3055,
-      "pagerank": 0.002006
+      "purchases": 3077,
+      "pagerank": 0.001997
     },
     {
       "idx": 32,
@@ -241,8 +253,8 @@
       "category": "electronics.smartphone",
       "price": 462.39,
       "views": 43407,
-      "purchases": 2438,
-      "pagerank": 0.00186
+      "purchases": 2521,
+      "pagerank": 0.001916
     },
     {
       "idx": 871,
@@ -252,8 +264,8 @@
       "category": "electronics.smartphone",
       "price": 289.51,
       "views": 48045,
-      "purchases": 2614,
-      "pagerank": 0.001551
+      "purchases": 2629,
+      "pagerank": 0.001546
     },
     {
       "idx": 18,
@@ -263,8 +275,8 @@
       "category": "electronics.smartphone",
       "price": 512.21,
       "views": 31738,
-      "purchases": 1722,
-      "pagerank": 0.001355
+      "purchases": 1744,
+      "pagerank": 0.001352
     },
     {
       "idx": 843,
@@ -274,8 +286,8 @@
       "category": "electronics.smartphone",
       "price": 230.61,
       "views": 34513,
-      "purchases": 1674,
-      "pagerank": 0.001271
+      "purchases": 1681,
+      "pagerank": 0.001263
     },
     {
       "idx": 874,
@@ -285,8 +297,8 @@
       "category": "electronics.smartphone",
       "price": 380.67,
       "views": 33627,
-      "purchases": 1436,
-      "pagerank": 0.001202
+      "purchases": 1442,
+      "pagerank": 0.001192
     },
     {
       "idx": 493,
@@ -296,119 +308,119 @@
       "category": "electronics.smartphone",
       "price": 730.53,
       "views": 52947,
-      "purchases": 2084,
-      "pagerank": 0.001172
+      "purchases": 2091,
+      "pagerank": 0.001166
     }
   ],
   "alertas_prioritarias": [
     {
       "severidad": 0,
-      "event_id": 145,
+      "event_id": 0,
       "card_id": 6000000000000699,
       "device_id": 3000000699,
       "reason": "tarjeta/dispositivo en lista negra",
-      "ts": 121.58276082623853
+      "ts": 124.02067881735123
     },
     {
       "severidad": 0,
-      "event_id": 162,
+      "event_id": 1,
       "card_id": 6000000000000699,
       "device_id": 3000000699,
       "reason": "tarjeta/dispositivo en lista negra",
-      "ts": 133.98890749655104
+      "ts": 136.42682548766373
     },
     {
       "severidad": 0,
-      "event_id": 187,
+      "event_id": 2,
       "card_id": 6000000000000699,
       "device_id": 3000000699,
       "reason": "tarjeta/dispositivo en lista negra",
-      "ts": 148.576145523874
+      "ts": 151.01406351498673
     },
     {
       "severidad": 0,
-      "event_id": 194,
+      "event_id": 3,
       "card_id": 6000000000000699,
       "device_id": 3000000699,
       "reason": "tarjeta/dispositivo en lista negra",
-      "ts": 154.8518944671412
+      "ts": 157.2898124582539
     },
     {
       "severidad": 0,
-      "event_id": 198,
+      "event_id": 4,
       "card_id": 6000000000000699,
       "device_id": 3000000699,
       "reason": "tarjeta/dispositivo en lista negra",
-      "ts": 159.01208687034932
+      "ts": 161.45000486146205
     },
     {
       "severidad": 0,
-      "event_id": 206,
+      "event_id": 5,
       "card_id": 6000000000000699,
       "device_id": 3000000699,
       "reason": "tarjeta/dispositivo en lista negra",
-      "ts": 167.01486846052416
+      "ts": 169.45278645163683
     },
     {
       "severidad": 0,
-      "event_id": 207,
+      "event_id": 6,
       "card_id": 6000000000000699,
       "device_id": 3000000699,
       "reason": "tarjeta/dispositivo en lista negra",
-      "ts": 167.6132675933303
+      "ts": 170.051185584443
     },
     {
       "severidad": 0,
-      "event_id": 220,
+      "event_id": 7,
       "card_id": 6000000000000699,
       "device_id": 3000000699,
       "reason": "tarjeta/dispositivo en lista negra",
-      "ts": 175.09920645014415
+      "ts": 177.53712444125682
     },
     {
       "severidad": 0,
-      "event_id": 243,
+      "event_id": 8,
       "card_id": 6000000000000699,
       "device_id": 3000000699,
       "reason": "tarjeta/dispositivo en lista negra",
-      "ts": 197.97858035510978
+      "ts": 200.4164983462225
     },
     {
       "severidad": 0,
-      "event_id": 249,
+      "event_id": 9,
       "card_id": 6000000000000699,
       "device_id": 3000000699,
       "reason": "tarjeta/dispositivo en lista negra",
-      "ts": 202.84588925096475
+      "ts": 205.28380724207744
     }
   ],
   "autocompletado": {
     "sam": [
       [
         "samsung",
-        116037.0
+        116049.0
       ],
       [
         "samsung smartphone",
-        80538.0
+        80537.0
       ],
       [
         "samsung tv",
-        7278.0
+        7279.0
       ],
       [
         "samsung washer",
-        5720.0
+        5721.0
       ],
       [
         "samsung vacuum",
-        4512.0
+        4513.0
       ]
     ],
     "app": [
       [
         "apple",
-        96207.0
+        96212.0
       ],
       [
         "apple smartphone",
@@ -416,11 +428,11 @@
       ],
       [
         "apple headphone",
-        8334.0
+        8333.0
       ],
       [
         "apple clocks",
-        5416.0
+        5417.0
       ],
       [
         "apple notebook",
@@ -430,7 +442,7 @@
     "lg ": [
       [
         "lg washer",
-        4190.0
+        4189.0
       ],
       [
         "lg tv",
@@ -446,17 +458,17 @@
       ],
       [
         "lg microwave",
-        546.0
+        545.0
       ]
     ],
     "nik": [
       [
         "nike",
-        1870.0
+        1871.0
       ],
       [
         "nike keds",
-        1384.0
+        1383.0
       ],
       [
         "nikon",
@@ -464,7 +476,7 @@
       ],
       [
         "nika",
-        855.0
+        856.0
       ],
       [
         "nika ironing board",
@@ -502,16 +514,16 @@
     "ryobi vacuum 84"
   ],
   "traza_evento": {
-    "evento": "Event(id=6966919, purchase, product=1004856, user=528344847, price=131.76)",
+    "evento": "Event(id=6967856, purchase, product=1004856, user=528344847, price=131.76)",
     "pasos": [
-      "[S0] encolado (cola=1413)",
+      "[S0] encolado (cola=2366)",
       "[S1] válido, normalizado y no duplicado",
-      "[S2] prioridad 3 (compra programada), posición 133 de 4929 en el lote",
-      "[S3] producto #861 y usuario #746718 resueltos en la tabla hash",
+      "[S2] prioridad 3 (compra programada), posición 89 de 4929 en el lote",
+      "[S3] producto #861 y usuario #746725 resueltos en la tabla hash",
       "[S6] pasa el filtro (Bloom: ausente; CMS bajo el umbral)",
       "[S4] orden indexada por tiempo en el B+Tree",
       "[S5] vecinos por atributos (KD-Tree): [786, 840, 14608]",
-      "[S7] relacionados LSH: []; vecinos IVF: [87190, 87862, 40728]",
+      "[S7] relacionados LSH: []; vecinos IVF: [87862, 87190, 40728]",
       "[S8] primera compra de la orden: nodo listo para nuevas aristas"
     ],
     "producto": {
@@ -522,7 +534,7 @@
       "category": "electronics.smartphone",
       "price": 131.76,
       "views": 99972,
-      "purchases": 6760
+      "purchases": 6810
     },
     "recomendaciones": [
       {
@@ -533,8 +545,8 @@
         "category": "electronics.smartphone",
         "price": 252.63,
         "views": 82294,
-        "purchases": 4872,
-        "puntaje": 1.689,
+        "purchases": 4890,
+        "puntaje": 1.687,
         "fuentes": "grafo+KD-Tree"
       },
       {
@@ -545,8 +557,8 @@
         "category": "electronics.smartphone",
         "price": 173.98,
         "views": 42043,
-        "purchases": 2788,
-        "puntaje": 1.448,
+        "purchases": 2802,
+        "puntaje": 1.447,
         "fuentes": "grafo+KD-Tree"
       },
       {
@@ -557,8 +569,8 @@
         "category": "electronics.smartphone",
         "price": 197.77,
         "views": 28199,
-        "purchases": 1246,
-        "puntaje": 1.024,
+        "purchases": 1255,
+        "puntaje": 1.025,
         "fuentes": "grafo"
       },
       {
@@ -581,8 +593,8 @@
         "category": "electronics.smartphone",
         "price": 230.61,
         "views": 34513,
-        "purchases": 1674,
-        "puntaje": 0.954,
+        "purchases": 1681,
+        "puntaje": 0.952,
         "fuentes": "grafo"
       }
     ],

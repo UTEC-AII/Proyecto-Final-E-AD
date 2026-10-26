@@ -1,41 +1,35 @@
-Evento trazado: 6966919
-   2,000,000 eventos | 14,284 ev/s | refresco #1
-   4,000,000 eventos | 12,410 ev/s | refresco #2
-   6,000,000 eventos | 10,977 ev/s | refresco #3
-   8,000,000 eventos | 10,040 ev/s | refresco #4
-  10,000,000 eventos | 9,295 ev/s | refresco #5
+Corrida de punta a punta con REES46 (2019-Oct.csv), 10,223,169 eventos.
+Plataforma: Apple M5, 10 nucleos, 16 GB, Python 3.14.3, NumPy 2.5.4.
+Comando: python scripts/run_pipeline.py --data data/rees46_10000000 --batch 5000 --refresh 2000000
+
+Evento trazado: Event(id=6967856, purchase, product=1004856, user=528344847, price=131.76)
 
 === Recorrido de un evento por las 10 etapas ===
-Event(id=6966919, purchase, product=1004856, user=528344847, price=131.76)
-  [S0] encolado (cola=1413)
+  [S0] encolado (cola=2366)
   [S1] válido, normalizado y no duplicado
-  [S2] prioridad 3 (compra programada), posición 133 de 4929 en el lote
-  [S3] producto #861 y usuario #746718 resueltos en la tabla hash
+  [S2] prioridad 3 (compra programada), posición 89 de 4929 en el lote
+  [S3] producto #861 y usuario #746725 resueltos en la tabla hash
   [S6] pasa el filtro (Bloom: ausente; CMS bajo el umbral)
   [S4] orden indexada por tiempo en el B+Tree
   [S5] vecinos por atributos (KD-Tree): [786, 840, 14608]
-  [S7] relacionados LSH: []; vecinos IVF: [87190, 87862, 40728]
+  [S7] relacionados LSH: []; vecinos IVF: [87862, 87190, 40728]
   [S8] primera compra de la orden: nodo listo para nuevas aristas
-  [S9] recomendaciones Top-5 para su producto:
-       samsung smartphone 4767                  puntaje=1.689  fuentes=grafo+KD-Tree
-       samsung smartphone 4833                  puntaje=1.448  fuentes=grafo+KD-Tree
-       samsung smartphone 4750                  puntaje=1.024  fuentes=grafo
-       generic unknown 8289                     puntaje=1.001  fuentes=IVF
-       samsung smartphone 4836                  puntaje=0.954  fuentes=grafo
+  [S9] Top-5 para su producto:
+       samsung smartphone 4767                    puntaje=1.687  fuentes=grafo+KD-Tree
+       samsung smartphone 4833                    puntaje=1.447  fuentes=grafo+KD-Tree
+       samsung smartphone 4750                    puntaje=1.025  fuentes=grafo
+       generic unknown 8289                       puntaje=1.001  fuentes=IVF
+       samsung smartphone 4836                    puntaje=0.952  fuentes=grafo
 
 === Resumen ===
 eventos_recibidos: 10223169
-eventos_que_pasan_el_filtro: 10001406
-segundos: 1246.18
-eventos_por_segundo: 8204
+eventos_que_pasan_el_filtro: 10005460
+segundos: 308.79
+eventos_por_segundo: 33107
 S1: {"invalidos": 0, "duplicados_eliminados": 151081, "duplicados_reales_detectados": 151081}
 S2: {"compra express": 76348, "compra premium": 8654, "compra estándar": 113925, "compra programada": 24516, "carrito": 221149, "vista": 9627496}
-S4: {"altura_indice_precio": 3, "paginas_precio": 532, "ordenes_indexadas": 178145, "altura_indice_ordenes": 3, "lecturas_disco": 1, "escrituras_disco": 911}
-S6: {"blocked": 70682, "precision": 0.9294587023570358, "recall": 0.9113305959382977, "bloom_positives": 34434, "bloom_false_positives": 7, "bloom_memory_bytes": 3401, "cms_memory_bytes": 2174800}
-S8: {"nodes_with_edges": 6901, "edges": 14035, "pagerank_iters": 89, "pagerank_s": 0.1255206410005485, "louvain_s": 0.16115500900014013, "louvain_Q": 0.6257845916508422, "louvain_k": 1005, "lpa_s": 0.1751183319993288, "lpa_Q": 0.39381996594527424, "lpa_k": 1608, "top20_overlap_pagerank_vs_degree": 0.9, "largest_communities": [642, 559, 525, 453, 265]}
+S4: {"ordenes_indexadas": 179043, "altura_precio": 3, "paginas_precio": 532, "altura_ordenes": 3, "paginas_ordenes": 1410, "lecturas_disco": 1, "escrituras_disco": 918, "paginas_por_busqueda": 3, "paginas_por_rango": 4}
+S6: {"blocked": 66628, "precision": 0.9535930839887135, "recall": 0.8813672178448563, "bloom_positives": 34434, "bloom_false_positives": 7, "bloom_memory_bytes": 3401, "cms_memory_bytes": 2174800, "alerts_blacklist": 34427, "alerts_card": 32201, "alerts_device": 0, "card_threshold": 12, "device_threshold": 20, "window_seconds": 600}
+S8: {"nodes_with_edges": 6921, "edges": 14176, "pagerank_iters": 89, "pagerank_s": 0.02756483299890533, "louvain_s": 0.07190004200674593, "louvain_Q": 0.6214945187890579, "louvain_k": 1005, "lpa_s": 0.06361250000190921, "lpa_Q": 0.3829046037678253, "lpa_k": 1621, "top20_overlap_pagerank_vs_degree": 0.9}
 
-Resumen completo en results/demo/summary_10M_rees46.json
-
-real	20m56.805s
-user	20m33.102s
-sys	4m19.198s
+Tiempos por etapa (s): {"setup": 0.392, "S0 ingesta": 58.154, "S1 preprocesamiento": 29.489, "S2 prioridad": 20.09, "S3 almacenamiento": 10.956, "S6 filtrado": 18.74, "S3 interacciones": 13.693, "S4 B+Tree": 0.821, "S5 KD-Tree": 0.051, "S7 similitud": 0.044, "S8 grafo": 0.386, "S9 servicio": 1.797, "S5 refresco KD-Tree": 0.617, "S7 refresco LSH+IVF": 151.02, "S8 refresco PageRank+Louvain": 0.658}

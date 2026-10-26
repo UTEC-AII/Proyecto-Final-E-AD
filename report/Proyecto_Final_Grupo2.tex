@@ -82,7 +82,7 @@ Ronald Ramiro Hilario Orihuela
 \section*{Resumen}
 \addcontentsline{toc}{section}{Resumen}
 
-Se construy\'o un pipeline de diez etapas que procesa de punta a punta 10,223,169 eventos de comercio electr\'onico (los primeros diez millones de octubre de 2019 del dataset REES46 y el componente de stream sint\'etico que exige el enunciado) a 8,204 eventos por segundo en Python, con todas las estructuras implementadas desde cero: cola FIFO enlazada, merge sort con b\'usqueda binaria, heap binario, tabla hash, cach\'e LRU, matriz dispersa, B+Tree en disco, KD-Tree, Bloom Filter, Count-Min Sketch, MinHash con LSH, IVF, HNSW, PageRank, Louvain, Label Propagation y Trie. La salida de cada etapa es la entrada real de la siguiente y se verifica con la traza de un evento por las diez etapas y con una prueba de integraci\'on autom\'atica. Repositorio: \url{https://github.com/UTEC-AII/Proyecto-Final-E-AD}.
+Se construy\'o un pipeline de diez etapas que procesa de punta a punta 10,223,169 eventos de comercio electr\'onico (los primeros diez millones de octubre de 2019 del dataset REES46 y el componente de stream sint\'etico que exige el enunciado) a 33,107 eventos por segundo en Python, con todas las estructuras implementadas desde cero: cola FIFO enlazada, merge sort con b\'usqueda binaria, heap binario, tabla hash, cach\'e LRU, matriz dispersa, B+Tree en disco, KD-Tree, Bloom Filter, Count-Min Sketch, MinHash con LSH, IVF, HNSW, PageRank, Louvain, Label Propagation y Trie. La salida de cada etapa es la entrada real de la siguiente y se verifica con la traza de un evento por las diez etapas y con una prueba de integraci\'on autom\'atica. Repositorio: \url{https://github.com/UTEC-AII/Proyecto-Final-E-AD}.
 
 Los experimentos de 1K a 10M confirman en escala log-log las complejidades te\'oricas. El B+Tree responde una b\'usqueda sobre 10M claves en 44 $\mu$s con altura 3; el KD-Tree resuelve KNN 537 veces m\'as r\'apido que la fuerza bruta en tres dimensiones; LSH responde consultas de casi duplicados 295 veces m\'as r\'apido que la comparaci\'on exhaustiva; IVF, 226 veces frente al KNN exacto en 32 dimensiones con \emph{recall}@10 de 0,95; y el Bloom Filter ocupa 12 MB donde la tabla hash exacta necesita 268 MB, con una tasa de falsos positivos de 1,01 \% frente al 1 \% te\'orico.
 
@@ -329,14 +329,14 @@ Sin aproximaci\'on, el KD-Tree en $d=32$ fue 421 veces m\'as lento que la fuerza
 \subsection{Grafo de co-compra}
 PageRank escala linealmente en aristas (pendiente 1,08) y converge en 47 a 56 iteraciones: 20,7 s para 9,9M aristas. Su correlaci\'on de Spearman con el grado ponderado es 0,99 y el top-100 coincide en 97 \%, as\'i que en co-compra la diferencia est\'a en la cola: PageRank sube productos conectados con productos centrales.
 
-En comunidades, sobre grafos con particiones plantadas, Louvain obtiene mayor modularidad que Label Propagation en todos los tama\~nos (0,781 frente a 0,750 con 1M aristas, igual a la partici\'on plantada), es m\'as estable entre semillas (NMI 0,99 frente a 0,94) y recupera mejor la partici\'on real (NMI 0,96 frente a 0,93), aunque tarda 25 s frente a 19 s. Con 10M aristas solo corri\'o LPA (448 s), que se fragment\'o en 104,606 comunidades con $Q=0,68$; Louvain en Python puro super\'o los 40 minutos y se acot\'o a 1M aristas. En el grafo real de co-compra, que es peque\~no y disperso porque pocas sesiones compran m\'as de un producto (6,901 productos y 14,035 aristas), Louvain logr\'o $Q=0,626$ con 1,005 comunidades frente a $Q=0,394$ de LPA con 1,608.
+En comunidades, sobre grafos con particiones plantadas, Louvain obtiene mayor modularidad que Label Propagation en todos los tama\~nos (0,781 frente a 0,750 con 1M aristas, igual a la partici\'on plantada), es m\'as estable entre semillas (NMI 0,99 frente a 0,94) y recupera mejor la partici\'on real (NMI 0,96 frente a 0,93), aunque tarda 25 s frente a 19 s. Con 10M aristas solo corri\'o LPA (448 s), que se fragment\'o en 104,606 comunidades con $Q=0,68$; Louvain en Python puro super\'o los 40 minutos y se acot\'o a 1M aristas. En el grafo real de co-compra, que es peque\~no y disperso porque pocas sesiones compran m\'as de un producto (6,921 productos y 14,176 aristas), Louvain logr\'o $Q=0,621$ con 1,005 comunidades frente a $Q=0,383$ de LPA con 1,621.
 
 
 % ============================================================
 \section{Corrida completa y correcciones de la versi\'on final}
 
-\subsection{Corrida de referencia con 10M de eventos}
-La Tabla~\ref{tab:corrida} resume la corrida de punta a punta sobre los 10,223,169 eventos. El total fue de 1,246 s (8,204 eventos por segundo). Se eliminaron los 151,081 duplicados inyectados sin falsos positivos, se indexaron 178,145 \'ordenes en el B+Tree en disco y la matriz usuario$\times$producto acumul\'o 5,8 millones de celdas no nulas. El refresco de S7 concentra el 55 \% del tiempo (SVD y k-means sobre la matriz completa); refrescar con menor frecuencia o en paralelo es la mejora m\'as directa.
+\subsection{Corrida con 10M de eventos}
+La Tabla~\ref{tab:corrida} resume la corrida de punta a punta sobre los 10,223,169 eventos. El total fue de 308,8 s (33,107 eventos por segundo). Se eliminaron los 151,081 duplicados inyectados sin falsos positivos, se indexaron 179,043 \'ordenes en el B+Tree en disco y la matriz usuario$\times$producto acumul\'o 5,8 millones de celdas no nulas. El filtro de S6 bloque\'o 66,628 eventos con 95,4 \% de precisi\'on y 88,1 \% de exhaustividad; de los 34,434 positivos del Bloom, 7 eran falsos y se descartaron con la verificaci\'on exacta. El refresco de S7 concentra el 49 \% del tiempo (SVD y k-means sobre la matriz completa); refrescar con menor frecuencia o en paralelo es la mejora m\'as directa.
 
 \begin{table}[H]
 \centering
@@ -345,20 +345,18 @@ La Tabla~\ref{tab:corrida} resume la corrida de punta a punta sobre los 10,223,1
 \toprule
 \textbf{Etapa} & \textbf{Tiempo (s)} & \textbf{Etapa} & \textbf{Tiempo (s)} \\
 \midrule
-S0 ingesta (lectura Parquet + cola) & 258,5 & S4 B+Tree & 3,8 \\
-S1 preprocesamiento & 69,5 & S5 KD-Tree & 0,4 \\
-S2 prioridad & 78,6 & S7 refresco LSH + SVD + IVF & 680,1 \\
-S3 almacenamiento e interacciones & 83,9 & S8 grafo y refrescos & 3,7 \\
-S6 filtrado & 50,3 & S9 servicio & 6,7 \\
+S0 ingesta (lectura Parquet + cola) & 58,2 & S4 B+Tree & 0,8 \\
+S1 preprocesamiento & 29,5 & S5 KD-Tree & 0,1 \\
+S2 prioridad & 20,1 & S7 refresco LSH + SVD + IVF & 151,0 \\
+S3 almacenamiento e interacciones & 24,7 & S8 grafo y refrescos & 1,1 \\
+S6 filtrado & 18,7 & S9 servicio & 1,8 \\
 \midrule
-\multicolumn{3}{@{}l}{\textbf{Total} (10,223,169 eventos)} & \textbf{1,246,2} \\
+\multicolumn{3}{@{}l}{\textbf{Total} (10,223,169 eventos)} & \textbf{308,8} \\
 \bottomrule
 \end{tabular}
-\caption{Tiempo por etapa en la corrida de referencia con los 10M eventos reales.}
+\caption{Tiempo por etapa en la corrida con los 10M eventos reales.}
 \label{tab:corrida}
 \end{table}
-
-Esta tabla corresponde a la corrida de referencia. Las cifras de S0, S1 y S6 son anteriores a las correcciones de la Secci\'on~\ref{sec:correcciones}; las dem\'as etapas no cambiaron porque ninguno de esos componentes fue modificado.
 
 \subsection{Correcciones aplicadas}
 \label{sec:correcciones}
