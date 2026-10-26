@@ -240,15 +240,15 @@ async function main() {
   s.addText("S0 a S2: entrar, limpiar y priorizar", { placeholder: "title" });
   const cw = 3.9;
   card(s, { x: 0.6, y: 1.5, w: cw, h: 5.2, tag: "S0", color: C.accent1, title: "Cola FIFO enlazada",
-    lines: ["Buffer entre el lector y el consumidor", "Capacidad máxima: si se llena, descarta y cuenta (backpressure)", "enqueue y dequeue O(1)"],
+    lines: ["Buffer entre el lector y el consumidor", "Capacidad de un lote: si se llena, el productor se detiene y se contabiliza", "enqueue y dequeue O(1)"],
     stat: `pend. ${fmt(slope("LinkedQueue", "enqueue+dequeue"), 2)}`, statLabel: "en log-log, esperado 1 para O(n)" });
   card(s, { x: 0.6 + cw + 0.2, y: 1.5, w: cw, h: 5.2, tag: "S1", color: C.accent1, title: "Merge sort + búsqueda binaria",
-    lines: ["Valida y normaliza cada evento", "Busca cada id en la ventana ordenada de los últimos 500K", "O(b log W) por lote"],
+    lines: ["Valida y normaliza cada evento", "Busca cada id con búsqueda binaria en las corridas ordenadas de los últimos 500K", "O(b log b) por corrida solapada; expira la corrida más antigua"],
     stat: fmt(S.S1.duplicados_eliminados), statLabel: `duplicados eliminados, ${fmt(S.S1.duplicados_reales_detectados)} reales` });
   card(s, { x: 0.6 + 2 * (cw + 0.2), y: 1.5, w: cw, h: 5.2, tag: "S2", color: C.accent1, title: "Heap binario",
     lines: ["Express, premium, estándar, programada, carrito, vista", "Desempate por orden de llegada", "push y pop O(log n)"],
     stat: fmt(S.S2["compra express"]), statLabel: "compras express atendidas primero" });
-  s.addNotes("Presenta: Sebastian. S0 es una cola enlazada con capacidad, que da backpressure. S1 elimina duplicados buscando cada id en una ventana ordenada con búsqueda binaria, sin guardar todos los ids. S2 es un heap: las compras express salen primero. Las pendientes medidas están cerca de lo esperado.");
+  s.addNotes("Presenta: Sebastian. S0 es una cola enlazada con capacidad, que da backpressure. S1 ordena el lote con merge sort, elimina los repetidos adyacentes y busca cada id con búsqueda binaria en las corridas ordenadas de los últimos 500 mil ids; cuando la ventana se llena descarta la corrida más antigua entera, así que nunca mezcla la ventana completa. S2 es un heap: las compras express salen primero. Las pendientes medidas están cerca de lo esperado.");
 
   // 6. S3-S5
   s = pres.addSlide({ masterName: "CONTENIDO", sectionTitle: "Etapas" });
@@ -271,12 +271,12 @@ async function main() {
   badge(s, "S6", 0.6, 1.55, C.accent2);
   s.addText([
     { text: "Bloom Filter: ", options: { bold: true, color: C.text1 } },
-    { text: "lista negra de tarjetas y dispositivos, p = 1 %, k = 7. Todo positivo se verifica contra el conjunto exacto antes de bloquear.", options: { color: C.text2, breakLine: true } },
+    { text: "lista negra de tarjetas y dispositivos, p = 0,1 %, k = 10. Todo positivo se verifica contra el conjunto exacto antes de bloquear.", options: { color: C.text2, breakLine: true } },
     { text: "Count-Min Sketch: ", options: { bold: true, color: C.text1 } },
     { text: "intentos por tarjeta y por dispositivo en una ventana de 10 minutos (anillo de 10 sub-sketches). Alerta con más de 12 o 20 intentos.", options: { color: C.text2 } },
   ], { x: 1.45, y: 1.5, w: 5.6, h: 2.6, fontSize: 15, margin: 0, isTextBox: true, valign: "top", paraSpaceAfter: 12 });
-  statBlock(s, 0.6, 4.3, 3.1, pct(S.S6.precision, 1), "precisión: lo demás son cuentas reales con ráfagas de compra", C.accent2);
-  statBlock(s, 3.9, 4.3, 3.1, pct(S.S6.recall, 1), "recall: las primeras compras de cada ráfaga pasan", C.accent2);
+  statBlock(s, 0.6, 4.3, 3.1, pct(S.S6.precision, 1), "precisión sobre los 10M eventos", C.accent2);
+  statBlock(s, 3.9, 4.3, 3.1, pct(S.S6.recall, 1), "recall sobre los 10M eventos", C.accent2);
   statBlock(s, 0.6, 5.65, 3.1, `${fmt(S.S6.bloom_memory_bytes / 1024, 1)} KB`, "memoria del Bloom", C.text1);
   statBlock(s, 3.9, 5.65, 3.1, fmt(S.S6.bloom_false_positives), "falsos positivos, descartados por la verificación", C.text1);
   const bloom = csv("bloom_vs_exact");
@@ -295,7 +295,7 @@ async function main() {
       catAxisLabelFontSize: 11, valAxisLabelFontSize: 10, valGridLine: { color: "E4E3DF", size: 0.5 },
       catGridLine: { style: "none" }, ...chartText });
   }
-  s.addNotes("Presenta: Clinton. El Bloom guarda la lista negra en pocos kilobytes y no tiene falsos negativos. Como un falso positivo bloquearía una compra legítima, cada positivo se verifica contra el conjunto exacto. El Count-Min cuenta intentos por tarjeta en una ventana deslizante de 10 minutos; nunca subestima, así que no oculta una ráfaga. El recall es 91 % porque los primeros intentos de cada ráfaga pasan antes de llegar al umbral. La precisión es 93 % porque en los datos reales hay unas 300 cuentas con hasta 110 carritos o compras en 10 minutos: parecen bots o revendedores, y en producción irían a revisión manual. Con datos sintéticos la precisión fue 99,998 %.");
+  s.addNotes(`Presenta: Clinton. El Bloom guarda la lista negra en pocos kilobytes y no tiene falsos negativos. Como un falso positivo bloquearía una compra legítima, cada positivo se verifica contra el conjunto exacto. El Count-Min cuenta intentos por tarjeta en una ventana deslizante de 10 minutos; nunca subestima, así que no oculta una ráfaga. El recall es ${fmt(100 * S.S6.recall, 1)} % porque los primeros intentos de cada ráfaga pasan antes de llegar al umbral. La precisión es ${fmt(100 * S.S6.precision, 1)} % porque en los datos reales hay unas 300 cuentas con hasta 110 carritos o compras en 10 minutos: parecen bots o revendedores, y en producción irían a revisión manual. Con datos sintéticos la precisión fue 99,998 %.`);
 
   // 8. S7
   s = pres.addSlide({ masterName: "CONTENIDO", sectionTitle: "Etapas" });
@@ -309,7 +309,7 @@ async function main() {
   ], { x: 1.45, y: 1.5, w: 5.6, h: 2.8, fontSize: 15, margin: 0, isTextBox: true, valign: "top", paraSpaceAfter: 12 });
   if (mhRow.n) {
     statBlock(s, 0.6, 4.2, 3.1, `${fmt(mhRow.speedup, 0)}x`, `LSH frente a fuerza bruta con ${fmt(mhRow.n / 1e6)}M conjuntos`, C.accent4);
-    statBlock(s, 3.9, 4.2, 3.1, fmt(mhRow.recall_at10_J05, 2), "recall@10 de vecinos con Jaccard ≥ 0,5", C.accent4);
+    statBlock(s, 3.9, 4.2, 3.1, fmt(mhRow.recall_at10_J05, 2), "recall@10 con Jaccard ≥ 0,5; global 2,9 %", C.accent4);
   }
   if (ivfTop.n) {
     statBlock(s, 0.6, 5.5, 3.1, `${fmt(annExact.query_ms / ivfTop.query_ms, 0)}x`, `IVF frente a exacto con ${fmt(ivfTop.n / 1e6)}M vectores`, C.text1);
@@ -375,7 +375,7 @@ async function main() {
 
   // 11. Demo
   s = pres.addSlide({ masterName: "CONTENIDO", sectionTitle: "Resultados" });
-  s.addText("Demo: el recorrido de una compra express por las etapas", { placeholder: "title" });
+  s.addText("Demo: el recorrido de una compra por las diez etapas", { placeholder: "title" });
   const t = S.traza_evento;
   const steps = [t.evento].concat(t.pasos.map((p) => p.replace(/^\s+/, "")));
   s.addText(steps.map((p, i) => ({ text: p, options: { breakLine: i < steps.length - 1 } })), {
@@ -386,7 +386,7 @@ async function main() {
     const f = imageFit(shot, 5.5, 5.1);
     s.addImage({ path: shot, x: 7.2, y: 1.5, w: f.w, h: f.h, altText: "Panel Streamlit con métricas y recorrido del evento" });
   }
-  s.addNotes("Presenta: Sebastian. Demo en vivo de 3 a 4 minutos: python scripts/run_pipeline.py --data data/synthetic_200000 y luego el panel con streamlit run src/eda/service/dashboard.py. A la izquierda está la traza literal de una compra de la corrida de 10M: entra a la cola, pasa la limpieza, sale tercera del heap, se resuelve en la tabla hash, pasa el filtro, se indexa en el B+Tree y termina en recomendaciones que combinan grafo, IVF y KD-Tree.");
+  s.addNotes("Presenta: Sebastian. Demo en vivo de 3 a 4 minutos: python scripts/run_pipeline.py --data data/synthetic_200000 y luego el panel con streamlit run src/eda/service/dashboard.py. A la izquierda está la traza literal de una compra de la corrida de 10M: entra a la cola, pasa la limpieza, el heap la deja detrás de las compras express, premium y estándar del lote, se resuelve en la tabla hash, pasa el filtro, se indexa en el B+Tree y termina en recomendaciones que combinan grafo, IVF y KD-Tree.");
 
   // 12. Corrida de 10M
   s = pres.addSlide({ masterName: "CONTENIDO", sectionTitle: "Resultados" });
@@ -399,7 +399,7 @@ async function main() {
     catAxisLabelColor: HEX.dk2, valAxisLabelColor: HEX.dk2, catAxisLabelFontSize: 10.5, valAxisLabelFontSize: 10,
     valGridLine: { color: "E4E3DF", size: 0.5 }, catGridLine: { style: "none" }, ...chartText });
   statBlock(s, 8.4, 1.5, 4.3, `${fmt(S.eventos_por_segundo)} ev/s`, "de punta a punta en Python, 1 proceso", C.accent1);
-  statBlock(s, 8.4, 2.95, 4.3, fmt(S.S4.ordenes_indexadas), `órdenes en el B+Tree en disco, altura ${S.S4.altura_indice_ordenes}`, C.text1);
+  statBlock(s, 8.4, 2.95, 4.3, fmt(S.S4.ordenes_indexadas), `órdenes en el B+Tree en disco, altura ${S.S4.altura_ordenes ?? S.S4.altura_indice_ordenes}`, C.text1);
   statBlock(s, 8.4, 4.4, 4.3, fmt(S.S6.blocked), "eventos de fraude bloqueados antes de llegar a S4", C.text1);
   s.addText("El refresco de S7 (SVD + k-means sobre la matriz usuario × producto) domina el tiempo: es el primer candidato a paralelizar.",
     { x: 8.4, y: 5.85, w: 4.3, h: 0.9, fontSize: 12.5, italic: true, color: C.text2, margin: 0, isTextBox: true, valign: "top" });
