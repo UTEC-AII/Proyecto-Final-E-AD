@@ -42,7 +42,7 @@ Si no, en dos semanas el informe y los datos no van a coincidir.
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-pytest -q                                  # 19 pruebas
+pytest -q                                  # 20 pruebas
 python scripts/prepare_data.py --events 200000
 python scripts/run_pipeline.py --data data/synthetic_200000 --refresh 50000
 ```

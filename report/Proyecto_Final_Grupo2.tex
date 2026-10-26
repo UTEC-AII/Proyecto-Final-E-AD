@@ -73,7 +73,9 @@ Ronald Ramiro Hilario Orihuela
 {\normalsize\bfseries DOCENTE}\\[0.2cm]
 {\normalsize Heider S\'anchez}\\[0.6cm]
 {\normalsize\bfseries CURSO}\\[0.2cm]
-{\normalsize Estructuras de Datos y Algoritmos (MCD8006)}\\[1cm]
+{\normalsize Estructuras de Datos y Algoritmos (MCD8006)}\\[0.6cm]
+{\normalsize\bfseries REPOSITORIO}\\[0.2cm]
+{\normalsize \url{https://github.com/UTEC-AII/Proyecto-Final-E-AD}}\\[1cm]
 \vfill
 {\normalsize Lima --- Per\'u, 2026}
 \end{titlepage}
@@ -157,7 +159,7 @@ El stream se procesa en lotes de 5,000 eventos. Las etapas incrementales (S0 a S
 \textbf{Etapa} & \textbf{Estructura} & \textbf{Funci\'on en el pipeline} & \textbf{Complejidad} & \textbf{Alternativa descartada} \\
 \midrule
 0 & Cola FIFO enlazada acotada & Buffer entre el lector y el consumidor por lotes & enqueue/dequeue $O(1)$ & Lista de Python: \code{pop(0)} es $O(n)$ \\
-1 & Merge sort + conjunto hash con ventana & Valida, normaliza, ordena por tiempo y deduplica & $O(b\log b)$ por lote; $O(1)$ por evento & Arreglo ordenado: mezcla $O(W)$ por lote \\
+1 & Merge sort + b\'usqueda binaria en corridas ordenadas & Valida, normaliza, ordena por tiempo y deduplica & $O(b\log b)$ por lote y por corrida solapada & Arreglo \'unico: mezcla $O(W)$; conjunto hash: 1,6$\times$ m\'as lento \\
 2 & Heap binario (min-heap) & Compras express, premium, est\'andar, programadas, carritos y vistas & push/pop $O(\log n)$; heapify $O(n)$ & Lista ordenada: inserci\'on $O(n)$ \\
 3 & Tabla hash, LRU y matriz dispersa DOK$\to$CSR & Resuelve \code{product_id} y \code{user_id}; cachea fichas; matriz usuario$\times$producto & $O(1)$ amortizado; CSR con $nnz$ & Matriz densa: $200K\times200K$ no cabe \\
 4 & B+Tree con p\'aginas de 4 KB & \'Indice de precio (carga masiva) e \'indice temporal de \'ordenes & b\'usqueda $O(\log_B n)$; rango $O(\log_B n + k/B)$ & \'Arbol binario: una p\'agina por nodo \\
@@ -183,7 +185,7 @@ El enunciado numera el filtrado probabil\'istico como etapa 6, despu\'es del KD-
 Cola enlazada con capacidad de un lote. \code{enqueue} y \code{dequeue} cuestan $O(1)$ y no hay desplazamientos de memoria; cuando la cola est\'a llena, \code{enqueue} devuelve falso, el productor se detiene y el evento se contabiliza como rechazo. La alternativa descartada es la lista de Python con \code{pop(0)}, cuyo costo es $O(n)$ por extracci\'on y $O(n^2)$ en un bucle de ingesta. La prueba \code{test\_linked\_queue\_fifo\_and\_capacity} verifica el orden FIFO y el rechazo al llenarse.
 
 \subsection{S1: Preprocesamiento y deduplicaci\'on}
-Se valida el evento (tipo v\'alido, producto, usuario, precio positivo y marca de tiempo), se normaliza texto y precio, y se deduplica en dos niveles: dentro del lote, ordenando por \code{event_id} para que los repetidos queden adyacentes, y contra una ventana deslizante de 500,000 identificadores. La ventana es un conjunto hash con un anillo de expiraci\'on: comprobar y registrar cuesta $O(1)$ por evento y la memoria queda acotada a la ventana. La alternativa descartada es el arreglo ordenado con b\'usqueda binaria, que obliga a mezclar del orden de $W$ elementos en cada lote ($O(W)$ por lote) frente al $O(1)$ del conjunto hash.
+Se valida el evento (tipo v\'alido, producto, usuario, precio positivo y marca de tiempo), se normaliza texto y precio, y se deduplica en dos niveles. Dentro del lote, merge sort por \code{event_id} deja los repetidos adyacentes. Contra la ventana de los \'ultimos 500,000 identificadores, la ventana se guarda como un anillo de corridas ordenadas, una por lote, y cada lote se busca con b\'usqueda binaria vectorizada solo en las corridas cuyo rango $[\min,\max]$ se solapa con el suyo; al llenarse, se descarta la corrida m\'as antigua completa. El costo es $O(b\log b)$ por lote y por corrida solapada, sin la mezcla $O(W)$ de un arreglo \'unico ordenado, y la memoria queda acotada a la ventana. Frente al conjunto hash propio, que es $O(1)$ por evento pero se ejecuta en Python puro, la b\'usqueda binaria vectorizada elimina exactamente los mismos duplicados y es 1,6 veces m\'as r\'apida sobre los 10M de eventos (50 s frente a 79 s en 4 vCPU).
 
 \subsection{S2: Prioridad con heap binario}
 Min-heap sobre arreglo con desempate por secuencia de llegada, de modo que dentro de una misma prioridad el orden es FIFO. Las compras se clasifican en express, premium, est\'andar y programadas; luego carritos y vistas. \code{push} y \code{pop} cuestan $O(\log n)$ y \code{heapify} $O(n)$. La alternativa descartada es mantener una lista ordenada, cuya inserci\'on es $O(n)$.
@@ -238,22 +240,22 @@ en dos fases repetidas: mover cada nodo a la comunidad vecina con mayor ganancia
 % ============================================================
 \section{Dise\~no de la integraci\'on}
 
-La integraci\'on se verifica con un evento concreto. En la corrida de 10M se traz\'o autom\'aticamente una compra leg\'itima ubicada al 70 \% del stream; la Figura~\ref{fig:traza} muestra su salida literal. Es la compra de un Samsung de 131,76 USD, el producto con mayor PageRank del grafo. Tiene env\'io programado, as\'i que el heap la deja en la posici\'on 133 de 4,929, detr\'as de las compras express, premium y est\'andar del lote. LSH no devolvi\'o candidatos porque ning\'un producto supera el umbral de Jaccard de 0,42 con su conjunto de compradores; la recomendaci\'on final combina el grafo de co-compra, el KD-Tree (smartphones de la misma marca y rango de precio) y el IVF, y deja registrada la fuente de cada producto.
+La integraci\'on se verifica con un evento concreto. En la corrida de 10M se traz\'o autom\'aticamente una compra leg\'itima ubicada al 70 \% del stream; la Figura~\ref{fig:traza} muestra su salida literal. Es la compra de un Samsung de 131,76 USD, el producto con mayor PageRank del grafo. Tiene env\'io programado, as\'i que el heap la deja en la posici\'on 89 de 4,929, detr\'as de las compras express, premium y est\'andar del lote. LSH no devolvi\'o candidatos porque ning\'un producto supera el umbral de Jaccard de 0,42 con su conjunto de compradores; la recomendaci\'on final combina el grafo de co-compra, el KD-Tree (smartphones de la misma marca y rango de precio) y el IVF, y deja registrada la fuente de cada producto.
 
 \begin{figure}[H]
 \centering
 \begin{lstlisting}[language=Python, basicstyle=\ttfamily\scriptsize]
-Event(id=6966919, purchase, product=1004856, user=528344847, price=131.76)
-[S0] encolado (cola=1413)
+Event(id=6967856, purchase, product=1004856, user=528344847, price=131.76)
+[S0] encolado (cola=2366)
 [S1] valido, normalizado y no duplicado
-[S2] prioridad 3 (compra programada), posicion 133 de 4929 en el lote
-[S3] producto #861 y usuario #746718 resueltos en la tabla hash
+[S2] prioridad 3 (compra programada), posicion 89 de 4929 en el lote
+[S3] producto #861 y usuario #746725 resueltos en la tabla hash
 [S6] pasa el filtro (Bloom: ausente; CMS bajo el umbral)
 [S4] orden indexada por tiempo en el B+Tree
 [S5] vecinos por atributos (KD-Tree): [786, 840, 14608]
-[S7] LSH: []; vecinos IVF: [87190, 87862, 40728]
+[S7] LSH: []; vecinos IVF: [87862, 87190, 40728]
 [S8] primera compra de la orden: nodo listo para nuevas aristas
-[S9] Top-5: samsung 4767 (1.689, grafo+KD) ... samsung 4836 (0.954, grafo)
+[S9] Top-5: samsung 4767 (1.687, grafo+KD) ... samsung 4836 (0.952, grafo)
 \end{lstlisting}
 \caption{Recorrido de un evento por las diez etapas en la corrida de 10M.}
 \label{fig:traza}
@@ -310,7 +312,7 @@ Con 10M actualizaciones sobre 1M claves, el Count-Min con $\varepsilon=0{,}001$ 
 \label{sec:similitud}
 La consulta LSH se mantiene entre 0,6 y 0,8 ms de 1K a 1M conjuntos (pendiente 0,05), mientras la fuerza bruta crece linealmente hasta 225 ms: LSH es 295 veces m\'as r\'apido en 1M. El costo est\'a en la construcci\'on (98 s para 1M) y en la memoria de las firmas (1,5 GB), por eso se omiti\'o 10M.
 
-Sobre el \emph{recall} conviene reportar las dos lecturas, porque LSH no es un \'indice de vecinos globales. Sobre los vecinos relevantes (Jaccard $\ge 0{,}5$) el recall@10 es 1,0; sobre el top-10 completo es 0,029, con 1,33 candidatos por consulta. Es el comportamiento esperado de un detector de casi duplicados con umbral 0,42: acierta lo que est\'a por encima del umbral y descarta lo que est\'a lejos. Para vecinos en el espacio completo se usa IVF, que s\'i se eval\'ua contra el KNN exacto: con 10M vectores de 32 dimensiones responde en 0,46 ms frente a 104 ms del KNN exacto (226 veces) con recall@10 de 0,95; con $n_{probe}=16$ sube a 0,98 a la mitad de velocidad. El \'indice ocupa 1,36 GB frente a 1,28 GB de los vectores: un 6 % m\'as de memoria por 226 veces menos tiempo. En 1M, el barrido de $n_{probe}$ de 1 a 32 recorre la curva de recall de 0,23 a 0,99. HNSW en Python puro lleg\'o a recall 0,97 en 10K pero a 0,80 en 100K con $ef$ de 50 a 100, y su construcci\'on tard\'o 316 s en 100K, por lo que se limit\'o a 100K.
+Sobre el \emph{recall} conviene reportar las dos lecturas, porque LSH no es un \'indice de vecinos globales. Sobre los vecinos relevantes (Jaccard $\ge 0{,}5$) el recall@10 es 1,0; sobre el top-10 completo es 0,029, con 1,33 candidatos por consulta. Es el comportamiento esperado de un detector de casi duplicados con umbral 0,42: acierta lo que est\'a por encima del umbral y descarta lo que est\'a lejos. Para vecinos en el espacio completo se usa IVF, que s\'i se eval\'ua contra el KNN exacto: con 10M vectores de 32 dimensiones responde en 0,46 ms frente a 104 ms del KNN exacto (226 veces) con recall@10 de 0,95; con $n_{probe}=16$ sube a 0,98 a la mitad de velocidad. El \'indice ocupa 1,36 GB frente a 1,28 GB de los vectores: un 6 \% m\'as de memoria por 226 veces menos tiempo. En 1M, el barrido de $n_{probe}$ de 1 a 32 recorre la curva de recall de 0,23 a 0,99. HNSW en Python puro lleg\'o a recall 0,97 en 10K pero a 0,80 en 100K con $ef$ de 50 a 100, y su construcci\'on tard\'o 316 s en 100K, por lo que se limit\'o a 100K.
 
 \begin{figure}[H]
 \centering
@@ -335,8 +337,8 @@ En comunidades, sobre grafos con particiones plantadas, Louvain obtiene mayor mo
 % ============================================================
 \section{Corrida completa y correcciones de la versi\'on final}
 
-\subsection{Corrida con 10M de eventos}
-La Tabla~\ref{tab:corrida} resume la corrida de punta a punta sobre los 10,223,169 eventos. El total fue de 308,8 s (33,107 eventos por segundo). Se eliminaron los 151,081 duplicados inyectados sin falsos positivos, se indexaron 179,043 \'ordenes en el B+Tree en disco y la matriz usuario$\times$producto acumul\'o 5,8 millones de celdas no nulas. El filtro de S6 bloque\'o 66,628 eventos con 95,4 \% de precisi\'on y 88,1 \% de exhaustividad; de los 34,434 positivos del Bloom, 7 eran falsos y se descartaron con la verificaci\'on exacta. El refresco de S7 concentra el 49 \% del tiempo (SVD y k-means sobre la matriz completa); refrescar con menor frecuencia o en paralelo es la mejora m\'as directa.
+\subsection{Corrida con 10M de eventos}\label{sec:corrida}
+La Tabla~\ref{tab:corrida} resume la corrida de punta a punta sobre los 10,223,169 eventos. El total fue de 308,8 s (33,107 eventos por segundo) en un Apple M5 de 10 n\'ucleos y 16 GB con Python 3.14, en un solo proceso. Se eliminaron los 151,081 duplicados inyectados sin falsos positivos, se indexaron 179,043 \'ordenes en el B+Tree en disco y la matriz usuario$\times$producto acumul\'o 5,8 millones de celdas no nulas. El filtro de S6 bloque\'o 66,628 eventos con 95,4 \% de precisi\'on y 88,1 \% de exhaustividad; de los 34,434 positivos del Bloom, 7 eran falsos y se descartaron con la verificaci\'on exacta. El refresco de S7 concentra el 49 \% del tiempo (SVD y k-means sobre la matriz completa); refrescar con menor frecuencia o en paralelo es la mejora m\'as directa.
 
 \begin{table}[H]
 \centering
@@ -346,7 +348,7 @@ La Tabla~\ref{tab:corrida} resume la corrida de punta a punta sobre los 10,223,1
 \textbf{Etapa} & \textbf{Tiempo (s)} & \textbf{Etapa} & \textbf{Tiempo (s)} \\
 \midrule
 S0 ingesta (lectura Parquet + cola) & 58,2 & S4 B+Tree & 0,8 \\
-S1 preprocesamiento & 29,5 & S5 KD-Tree & 0,1 \\
+S1 preprocesamiento & 29,5 & S5 KD-Tree y refresco & 0,7 \\
 S2 prioridad & 20,1 & S7 refresco LSH + SVD + IVF & 151,0 \\
 S3 almacenamiento e interacciones & 24,7 & S8 grafo y refrescos & 1,1 \\
 S6 filtrado & 18,7 & S9 servicio & 1,8 \\
@@ -364,7 +366,7 @@ La revisi\'on del c\'odigo y del informe identific\'o seis defectos que se corri
 
 \begin{enumerate}[leftmargin=1.2em]
 \item \textbf{S6: marca permanente.} Cuando una tarjeta cruzaba el umbral quedaba bloqueada para siempre, as\'i que la regla dejaba de ser una ventana de diez minutos. Ahora el umbral se eval\'ua siempre sobre la ventana m\'ovil y la tarjeta vuelve a operar cuando su conteo decae. Se reportan las alertas por motivo.
-\item \textbf{S1: estructura de deduplicaci\'on.} El arreglo ordenado con b\'usqueda binaria obligaba a mezclar del orden de 500 mil identificadores por lote. Se reemplaz\'o por un conjunto hash con anillo de expiraci\'on: $O(1)$ por evento y memoria acotada.
+\item \textbf{S1: estructura de deduplicaci\'on.} El arreglo \'unico ordenado obligaba a mezclar del orden de 500 mil identificadores por lote. Un conjunto hash resolv\'ia el costo pero dejaba la etapa sin la b\'usqueda binaria que pide el enunciado. La versi\'on final guarda la ventana como corridas ordenadas por lote y busca con b\'usqueda binaria vectorizada: sin mezclas $O(W)$, con memoria acotada y 1,6 veces m\'as r\'apida que el conjunto hash.
 \item \textbf{S0: capacidad de la cola.} El buffer era cuatro veces el lote, de modo que el backpressure nunca se ejerc\'ia. Ahora su capacidad es de un lote, cuenta los rechazos cuando est\'a llena y una prueba unitaria verifica el rechazo.
 \item \textbf{S3: corrupci\'on silenciosa de la matriz.} La celda se codificaba como \code{fila*ncols+col}; al crecer el cat\'alogo, las claves ya guardadas se decodificaban corridas. Ahora la clave es el par (fila, columna).
 \item \textbf{S5 y S8: corrupci\'on del grafo.} La arista se codificaba como \code{a*n+b} con una dimensi\'on que cambiaba al refrescar. Ahora la arista es el par $(u,v)$ y la dimensi\'on se recalcula al construir la CSR.
@@ -376,14 +378,14 @@ Adem\'as se corrigieron tres problemas de documentaci\'on: la Tabla de estructur
 \subsection{Validaci\'on de las correcciones}
 Las correcciones se validaron con una corrida completa de la versi\'on final sobre un mill\'on de eventos sint\'eticos (1,022,378 tras inyectar r\'afagas y duplicados), en 27,37 s y 37,358 eventos por segundo. Los 15,109 duplicados se eliminaron todos. El filtro bloque\'o 5,974 eventos con precisi\'on de 100 \% y \emph{recall} de 82,12 \%: el \emph{recall} baja respecto de la versi\'on anterior porque ya no se sostiene con una marca permanente, que es precisamente el sesgo que se corrigi\'o. Las alertas se repartieron en 3,433 por lista negra y 2,541 por frecuencia de tarjeta. El B+Tree qued\'o con altura 2, 90 p\'aginas en el \'indice de precio y 202 en el de \'ordenes (dos p\'aginas por b\'usqueda), y el grafo con 6,368 nodos y 23,690 aristas, con Louvain en $Q=0,914$ frente a $Q=0,853$ de LPA.
 
-La corrida de 10M con la versi\'on final requiere el archivo \code{2019-Oct.csv} de REES46 y se reproduce con \code{scripts/reproduce.sh}; tarda alrededor de 21 minutos en la plataforma descrita.
+El cambio de S1 se valid\'o lote por lote sobre los 10M de eventos reales con \code{bench/bench_s1_dedup.py}: en los 2,045 lotes la salida es id\'entica a la del conjunto hash y se eliminan los mismos 151,081 duplicados, por lo que las cifras de la Secci\'on~\ref{sec:corrida} no cambian. La corrida de 10M con la versi\'on final requiere el archivo \code{2019-Oct.csv} de REES46 y se reproduce con \code{scripts/reproduce.sh}; tard\'o 308,8 s en el Apple M5 descrito en la Secci\'on~\ref{sec:corrida}.
 
 % ============================================================
 \section{L\'imites y trabajos futuros}
 
 Python puro limita las repeticiones en 10M y deja fuera Louvain sobre 10M aristas y MinHash sobre 10M conjuntos. El KD-Tree pierde su ventaja en 32 dimensiones, lo que se reporta como hallazgo y no como fallo: en el pipeline se usa en tres dimensiones y los embeddings se buscan con IVF. En los datos reales el umbral fijo del Count-Min confunde a los usuarios de muy alta frecuencia con fraude: hay 309 cuentas con m\'as de 12 carritos o compras en diez minutos, hasta 110, un patr\'on de bot o revendedor que la etiqueta sint\'etica no marca. En producci\'on esas alertas ir\'ian a revisi\'on manual en lugar de bloquearse.
 
-Como trabajo futuro: procesar octubre y noviembre completos (110M eventos), calibrar el umbral por usuario, paralelizar el refresco de S7 que concentra el 55 \% del tiempo, comparar Leiden con Louvain y usar Counting Bloom para poder retirar tarjetas de la lista negra.
+Como trabajo futuro: procesar octubre y noviembre completos (110M eventos), calibrar el umbral por usuario, paralelizar el refresco de S7 que concentra el 49 \% del tiempo, comparar Leiden con Louvain y usar Counting Bloom para poder retirar tarjetas de la lista negra.
 
 % ============================================================
 \section{Conclusiones}

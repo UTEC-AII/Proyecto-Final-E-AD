@@ -20,3 +20,19 @@ def test_pipeline_end_to_end(tmp_path):
     assert stages == ["[S0", "[S1", "[S2", "[S3", "[S6", "[S4", "[S5", "[S7", "[S8"]
     assert t["recomendaciones"]
     assert os.path.exists(tmp_path / "w" / "price_index.bpt")
+
+
+def test_preprocessor_dedup_with_binary_search_window():
+    from eda.pipeline.events import Event
+    from eda.pipeline.stages import Preprocessor
+
+    def ev(i, dup=False):
+        return Event(event_id=i, ts=float(i), event_type="view", product_id=1, user_id=1, price=10.0,
+                     is_duplicate=dup)
+
+    s1 = Preprocessor(window_ids=4)
+    assert [e.event_id for e in s1.process([ev(3), ev(1), ev(2), ev(1, True)])] == [1, 2, 3]
+    assert [e.event_id for e in s1.process([ev(4), ev(2, True), ev(5)])] == [4, 5]  # 2 está en la ventana
+    s1.process([ev(6), ev(7)])  # la ventana supera 4 ids: expira la corrida [1, 2, 3]
+    assert [e.event_id for e in s1.process([ev(1), ev(5, True)])] == [1]
+    assert s1.duplicates == s1.dup_true_positive == 3

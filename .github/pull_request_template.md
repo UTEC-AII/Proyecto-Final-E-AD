@@ -12,7 +12,7 @@
 
 ## Checklist
 
-- [ ] `pytest -q` pasa en local (19 pruebas).
+- [ ] `pytest -q` pasa en local (20 pruebas).
 - [ ] Si toca una estructura del informe, se actualizó su complejidad o su tabla.
 - [ ] Si cambia una cifra del informe, se regeneró el CSV de `results/bench/` y se actualizó el número en el `.tex` y en el `.pdf`.
 - [ ] Si cambia el pipeline, la traza del evento sigue mostrando las 10 etapas.

@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 echo "== 1/4  Datos (10M eventos reales + componente sintetico)"
 python scripts/prepare_data.py --source rees46 --events 10000000
 
-echo "== 2/4  Pipeline de punta a punta (5 refrescos, ~21 min)"
+echo "== 2/4  Pipeline de punta a punta (5 refrescos, ~5 min en un Apple M5)"
 python scripts/run_pipeline.py --data data/rees46_10000000 \
     --batch 5000 --refresh 2000000 --out results/demo/summary_10M.json
 
