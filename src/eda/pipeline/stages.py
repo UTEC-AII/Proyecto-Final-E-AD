@@ -75,21 +75,26 @@ class Ingestion:
 
 # --------------------------------------------------------------------- S1
 class Preprocessor:
-    """S1: valida, normaliza, ordena por tiempo (merge sort) y elimina duplicados.
+    """S1: valida, normaliza, ordena (merge sort) y elimina duplicados con búsqueda binaria.
 
     Deduplicación exacta en dos niveles: dentro del lote (ids adyacentes tras
-    ordenar) y contra una ventana deslizante de ids ya vistos, implementada
-    como conjunto hash más un anillo de expiración: O(1) por evento y memoria
-    acotada a la ventana (Semana 04: conjunto hash para membresía).
+    ordenar por event_id) y contra una ventana de los últimos 500K ids vistos.
+    La ventana es un anillo de corridas ordenadas, una por lote: cada id nuevo
+    se busca con búsqueda binaria vectorizada en las corridas cuyo rango
+    [mínimo, máximo] se solapa con el del lote, y al llenarse la ventana se
+    descarta la corrida más antigua completa. Así no hay que mezclar la
+    ventana entera en cada lote (O(W)): el costo es O(b log b) por lote más
+    O(b log b) por corrida solapada, con memoria acotada a la ventana.
     """
 
     def __init__(self, window_ids: int = 500_000) -> None:
-        self.seen = HashSet(max(16, window_ids * 2))
-        self.ring: deque = deque()
+        self.runs: deque = deque()  # corridas ordenadas de ids, de la más antigua a la más nueva
+        self.window_size = 0
         self.window_ids = window_ids
         self.invalid = 0
         self.duplicates = 0
         self.dup_true_positive = 0
+        self.runs_searched = 0
 
     def _valid(self, e: Event) -> bool:
         return (e.event_type in VALID_TYPES and e.product_id is not None and e.user_id is not None
@@ -115,16 +120,28 @@ class Preprocessor:
                 continue
             last = e.event_id
             unique.append(e)
+        if not unique:
+            return []
+        ids = np.fromiter((e.event_id for e in unique), dtype=np.int64, count=len(unique))  # ya ordenados
+        seen = np.zeros(ids.shape[0], dtype=bool)
+        lo, hi = ids[0], ids[-1]
+        for run in self.runs:  # duplicados contra la ventana: búsqueda binaria en cada corrida
+            if run[0] > hi or run[-1] < lo:
+                continue  # rangos disjuntos: ningún id del lote puede estar en esta corrida
+            self.runs_searched += 1
+            seen |= contains_sorted(run, ids)
         out = []
-        for e in unique:
-            if e.event_id in self.seen:  # duplicado contra la ventana
+        for e, dup in zip(unique, seen.tolist()):
+            if dup:
                 self._drop(e)
-                continue
-            self.seen.add(e.event_id)
-            self.ring.append(e.event_id)
-            if len(self.ring) > self.window_ids:  # expira el más antiguo
-                self.seen.discard(self.ring.popleft())
-            out.append(e)
+            else:
+                out.append(e)
+        new_run = ids[~seen]
+        if new_run.shape[0]:
+            self.runs.append(new_run)
+            self.window_size += new_run.shape[0]
+            while self.window_size - self.runs[0].shape[0] >= self.window_ids:
+                self.window_size -= self.runs.popleft().shape[0]  # expira la corrida más antigua
         out = merge_sort(out, key=lambda e: e.ts)
         for e in out:
             e.note("S1", "válido, normalizado y no duplicado")
