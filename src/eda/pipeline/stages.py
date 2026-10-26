@@ -346,6 +346,10 @@ class FraudFilter:
       bloquear (la decisión es crítica).
     - CMS con ventana de 10 min (10 intervalos de 1 min): intentos de compra o
       carrito por tarjeta y por dispositivo. Alerta si supera el umbral.
+
+    El umbral se evalua siempre sobre la ventana movil: cuando los intentos
+    salen de los 10 minutos el conteo decae y la tarjeta vuelve a operar con
+    normalidad. No hay marcas permanentes (Semana 07: ventanas deslizantes).
     """
 
     def __init__(self, blacklist: Dict[str, np.ndarray], window_seconds: int = 600,
@@ -362,7 +366,7 @@ class FraudFilter:
         self.card_threshold = card_threshold
         self.device_threshold = device_threshold
         self.alerts = BinaryHeap()  # severidad: 0 lista negra, 1 frecuencia de tarjeta, 2 de dispositivo
-        self.flagged_cards = HashSet()
+        self.alerts_blacklist = self.alerts_card = self.alerts_device = 0
         self.bloom_positives = 0
         self.bloom_false_positives = 0
         self.blocked = 0
@@ -378,6 +382,7 @@ class FraudFilter:
                         self.bloom_positives += 1
                         if key in self.exact:  # verificación exacta antes de bloquear
                             self._alert(0, e, "tarjeta/dispositivo en lista negra")
+                            self.alerts_blacklist += 1
                             blocked = True
                             break
                         self.bloom_false_positives += 1
@@ -386,12 +391,15 @@ class FraudFilter:
                     self.device_cms.update(e.device_id, e.ts)
                     c = self.card_cms.estimate(e.card_id, e.ts)
                     d = self.device_cms.estimate(e.device_id, e.ts)
-                    if c > self.card_threshold or e.card_id in self.flagged_cards:
-                        self.flagged_cards.add(e.card_id)
+                    if c > self.card_threshold:
+                        # solo la ventana decide: al salir de los 10 min, el
+                        # conteo baja y la tarjeta se desbloquea sola
                         self._alert(1, e, f"{c} intentos con la tarjeta en 10 min")
+                        self.alerts_card += 1
                         blocked = True
                     elif d > self.device_threshold:
                         self._alert(2, e, f"{d} intentos desde el dispositivo en 10 min")
+                        self.alerts_device += 1
                         blocked = True
             if blocked:
                 self.blocked += 1
@@ -415,7 +423,10 @@ class FraudFilter:
         return {"blocked": self.blocked, "precision": prec, "recall": rec,
                 "bloom_positives": self.bloom_positives, "bloom_false_positives": self.bloom_false_positives,
                 "bloom_memory_bytes": self.bloom.memory_bytes(),
-                "cms_memory_bytes": self.card_cms.memory_bytes() + self.device_cms.memory_bytes()}
+                "cms_memory_bytes": self.card_cms.memory_bytes() + self.device_cms.memory_bytes(),
+                "alerts_blacklist": self.alerts_blacklist, "alerts_card": self.alerts_card,
+                "alerts_device": self.alerts_device, "card_threshold": self.card_threshold,
+                "device_threshold": self.device_threshold, "window_seconds": self.card_cms.window}
 
 
 # --------------------------------------------------------------------- S7
