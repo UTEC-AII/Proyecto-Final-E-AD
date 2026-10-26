@@ -62,7 +62,7 @@ DuckDB lee los CSV en streaming y toma los primeros 10M eventos en orden tempora
 ## Arquitectura
 
 | Etapa | Estructura (archivo) | Qué hace | Qué entrega |
-|---|---|---|---|
+|---|---|---|---|---|
 | S0 Ingesta | Cola FIFO enlazada ([`linked_queue.py`](src/eda/structures/linked_queue.py)) | Buffer con capacidad entre el lector y el consumidor por lotes | Lotes de eventos |
 | S1 Preprocesamiento | Merge sort + búsqueda binaria ([`sorting.py`](src/eda/structures/sorting.py)) | Valida, normaliza, elimina duplicados contra una ventana de 500K ids y ordena por tiempo | Eventos limpios |
 | S2 Prioridad | Heap binario ([`heap.py`](src/eda/structures/heap.py)) | Compras express, premium, estándar, programadas, carritos, vistas | Eventos en orden de urgencia |
@@ -108,12 +108,12 @@ Las pendientes log-log medidas están en [`results/bench/slopes.csv`](results/be
 
 Cada integrante es responsable principal de al menos dos etapas o una familia de algoritmos, la expone en la presentación y responde por ella en la sustentación.
 
-| Integrante | Responsable principal de | Familias del bloque avanzado |
-|---|---|---|
-| Sebastián Rodrigo García Villacorta | S0 Ingesta, S1 Preprocesamiento, S2 Prioridad, S9 Servicio y panel | — |
-| Dante Guillermo Barreto Daza | S3 Almacenamiento (hash, LRU, matriz dispersa), S4 B+Tree, S5 KD-Tree | — |
-| Clinton Michael Chulluncuy Reynoso | S6 Filtrado, S8 Grafo | Filtrado probabilístico, ranking de influencia, comunidades |
-| Ronald Ramiro Hilario Orihuela | S7 Similitud, experimentos | Similitud de conjuntos, ANN vectorial |
+| Integrante | Responsable principal de | Familia del bloque avanzado | Aporte concreto en la entrega final |
+|---|---|---|---|
+| Sebastian Rodrigo Garcia Villacorta | S0 Ingesta, S1 Preprocesamiento, S2 Prioridad, S9 Servicio y panel | — | Deduplicación con conjunto hash y ventana circular, cola acotada con contador de rechazos, panel y trazas |
+| Dante Guillermo Barreto Daza | S3 Almacenamiento (hash, LRU, matriz dispersa), S4 B+Tree, S5 KD-Tree | — | Matriz y grafo con pares (fila, columna) y (u, v), métricas de altura y páginas del B+Tree |
+| Clinton Michael Chulluncuy Reynoso | S6 Filtrado, S8 Grafo | Filtrado probabilístico, ranking, comunidades | Ventana móvil de S6 sin marcas permanentes, PageRank y Louvain frente a Label Propagation |
+| Ronald Ramiro Hilario Orihuela | S7 Similitud, experimentos | Similitud de conjuntos, ANN | Recall de LSH con sus dos lecturas, IVF frente a KNN exacto y memoria pico del benchmark |
 
 Cada integrante revisa, prueba y responde por las etapas a su cargo; el historial de commits y los pull requests documentan esa contribución.
 
