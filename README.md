@@ -80,16 +80,16 @@ El orquestador está en [`src/eda/pipeline/`](src/eda/pipeline). S6 corre justo 
 
 ## Resultados principales
 
-Corrida de punta a punta con **10.223.169 eventos reales de REES46** (1 al 8 de octubre de 2019, más el componente de stream) en 4 vCPU con Python 3.13. El resumen está en [`results/demo/summary_10M.json`](results/demo/summary_10M.json) y el log en [`results/demo/run_10M_rees46.log`](results/demo/run_10M_rees46.log):
+Corrida de punta a punta con **10,223,169 eventos reales de REES46** (1 al 8 de octubre de 2019, más el componente de stream) en 4 vCPU con Python 3.13. Es la corrida de referencia: las correcciones de S0, S1 y S6 se detallan más abajo. El resumen está en [`results/demo/summary_10M.json`](results/demo/summary_10M.json) y el log en [`results/demo/run_10M_rees46.log`](results/demo/run_10M_rees46.log):
 
 | Métrica | Valor |
 |---|---|
-| Datos | 120.565 productos, 1.072.341 usuarios; 95,6 % de los eventos son vistas |
-| Tiempo total | 1.246 s (8.204 eventos/s); el refresco de S7 es el 55 % |
-| Duplicados eliminados (S1) | 151.081 de 151.081 inyectados |
-| Fraude (S6) | 70.682 bloqueados, precisión 92,9 %, recall 91,1 %; Bloom de 3,4 KB, 7 falsos positivos descartados |
-| B+Tree en disco (S4) | 178.145 órdenes, altura 3 |
-| Grafo de co-compra (S8) | 6.901 productos, 14.035 aristas; Louvain Q = 0,626 frente a LPA Q = 0,394 |
+| Datos | 120,565 productos, 1,072,341 usuarios; 95,6 % de los eventos son vistas |
+| Tiempo total | 1,246 s (8,204 eventos/s); el refresco de S7 es el 55 % |
+| Duplicados eliminados (S1) | 151,081 de 151,081 inyectados |
+| Fraude (S6) | 70,682 bloqueados, precisión 92,9 %, recall 91,1 %; Bloom de 3,4 KB, 7 falsos positivos descartados |
+| B+Tree en disco (S4) | 178,145 órdenes, altura 3 |
+| Grafo de co-compra (S8) | 6,901 productos, 14,035 aristas; Louvain Q = 0,626 frente a LPA Q = 0,394 |
 
 Experimentos de 1K a 10M (detalle y figuras en el informe):
 
