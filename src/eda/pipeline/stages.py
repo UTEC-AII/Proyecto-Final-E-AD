@@ -267,12 +267,15 @@ class DiskIndex:
         self.price.bulk_load(keys[order], order)  # carga masiva ordenada: O(n)
         self.orders = BPlusTree(os.path.join(workdir, "orders_index.bpt"), page_size=page_size)
         self.indexed_products = len(prices)
+        self.new_indexed = HashSet(max(16, 1024))  # productos nuevos ya insertados
 
     def process(self, batch: List[Event]) -> List[Event]:
         for e in batch:
-            if e.product_idx >= self.indexed_products:  # producto nuevo -> inserción
+            if e.product_idx >= self.indexed_products and e.product_idx not in self.new_indexed:
+                # producto nuevo en el stream: se inserta una sola vez, sin
+                # depender de que los indices lleguen en orden
                 self.price.insert(price_key(e.price, e.product_idx), e.product_idx)
-                self.indexed_products = e.product_idx + 1
+                self.new_indexed.add(e.product_idx)
             if e.event_type == "purchase":
                 # clave temporal única: segundos * 2^20 + id de evento (mod 2^20)
                 self.orders.insert((int(e.ts) << 20) | (e.event_id & 0xFFFFF), e.event_id)
@@ -285,6 +288,15 @@ class DiskIndex:
 
     def orders_between(self, t0: float, t1: float) -> List[int]:
         return [v for _, v in self.orders.range_search(int(t0) << 20, (int(t1) << 20) | 0xFFFFF)]
+
+    def stats(self) -> dict:
+        """Cifras del indice: altura, paginas y accesos logicos por busqueda."""
+        return {"altura_precio": self.price.height, "paginas_precio": self.price.n_pages,
+                "altura_ordenes": self.orders.height, "paginas_ordenes": self.orders.n_pages,
+                "lecturas_disco": self.price.reads + self.orders.reads,
+                "escrituras_disco": self.price.writes + self.orders.writes,
+                "paginas_por_busqueda": self.price.height,
+                "paginas_por_rango": self.price.height + 1}
 
     def close(self) -> None:
         self.price.close()
@@ -491,7 +503,7 @@ class GraphStage:
             if e.product_idx not in items:
                 for other in items[-20:]:  # aristas con lo ya comprado en la misma orden
                     a, b = min(other, e.product_idx), max(other, e.product_idx)
-                    key = a * self.graph.n + b
+                    key = (a, b)
                     self.graph._edges[key] = self.graph._edges.get(key, 0.0) + 1.0
                 prev = items[-20:]
                 items.append(e.product_idx)

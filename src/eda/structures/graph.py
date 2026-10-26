@@ -27,7 +27,7 @@ class CoPurchaseGraph:
 
     def __init__(self, n_nodes: int) -> None:
         self.n = n_nodes
-        self._edges: Dict[int, float] = {}
+        self._edges: Dict[Tuple[int, int], float] = {}
         self.orders = 0
 
     def add_order(self, items: Iterable[int], max_items: int = 20) -> int:
@@ -35,7 +35,7 @@ class CoPurchaseGraph:
         added = 0
         for a in range(len(items)):
             for b in range(a + 1, len(items)):
-                key = items[a] * self.n + items[b]
+                key = (items[a], items[b])
                 self._edges[key] = self._edges.get(key, 0.0) + 1.0
                 added += 1
         self.orders += 1
@@ -49,10 +49,12 @@ class CoPurchaseGraph:
         if not self._edges:
             return CSRMatrix(np.zeros(self.n + 1, dtype=np.int64), np.empty(0, dtype=np.int64),
                              np.empty(0), (self.n, self.n))
-        keys = np.fromiter(self._edges.keys(), dtype=np.int64, count=len(self._edges))
-        w = np.fromiter(self._edges.values(), dtype=np.float64, count=len(self._edges))
-        u, v = keys // self.n, keys % self.n
-        return symmetric_csr(u, v, w, self.n)
+        pairs = list(self._edges.keys())
+        u = np.fromiter((a for a, _ in pairs), dtype=np.int64, count=len(pairs))
+        v = np.fromiter((b for _, b in pairs), dtype=np.int64, count=len(pairs))
+        w = np.fromiter(self._edges.values(), dtype=np.float64, count=len(pairs))
+        n = int(max(self.n, int(u.max()) + 1, int(v.max()) + 1))
+        return symmetric_csr(u, v, w, n)
 
 
 def symmetric_csr(u: np.ndarray, v: np.ndarray, w: np.ndarray, n: int) -> CSRMatrix:

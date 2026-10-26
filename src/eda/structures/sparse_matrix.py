@@ -3,8 +3,9 @@
 Una matriz 200K x 50K densa ocuparía 80 GB en float64; en CSR solo se guardan
 los nnz valores no nulos: data (nnz), indices (nnz) e indptr (filas + 1).
 
-- DOKAccumulator: acumulador incremental (clave = fila * ncols + col) sobre
-  la HashTable propia; recibe el stream evento a evento.
+- DOKAccumulator: acumulador incremental sobre la HashTable propia, con la
+  celda (fila, col) como clave; recibe el stream evento a evento. Al usar el
+  par como clave, la matriz no se corrompe si crece el numero de columnas.
 - CSRMatrix: estructura compacta e inmutable; fila i = data[indptr[i]:indptr[i+1]].
   matvec O(nnz), matmat O(nnz * k), transpuesta O(nnz + n).
 - randomized_svd: SVD truncada aleatorizada (Halko et al., 2011) usando solo
@@ -28,10 +29,10 @@ class DOKAccumulator:
         self._t = HashTable(1024)
 
     def add(self, row: int, col: int, value: float = 1.0) -> None:
-        self._t.increment(row * self.ncols + col, value)
+        self._t.increment((row, col), value)
 
     def get(self, row: int, col: int) -> float:
-        return self._t.get(row * self.ncols + col, 0.0)
+        return self._t.get((row, col), 0.0)
 
     @property
     def nnz(self) -> int:
@@ -39,12 +40,14 @@ class DOKAccumulator:
 
     def to_csr(self) -> "CSRMatrix":
         n = len(self._t)
-        keys = np.empty(n, dtype=np.int64)
+        rows = np.empty(n, dtype=np.int64)
+        cols = np.empty(n, dtype=np.int64)
         vals = np.empty(n, dtype=np.float64)
-        for i, (k, v) in enumerate(self._t.items()):
-            keys[i] = k
+        for i, ((r, c), v) in enumerate(self._t.items()):
+            rows[i] = r
+            cols[i] = c
             vals[i] = v
-        return CSRMatrix.from_coo(keys // self.ncols, keys % self.ncols, vals, (self.nrows, self.ncols))
+        return CSRMatrix.from_coo(rows, cols, vals, (self.nrows, self.ncols))
 
 
 class CSRMatrix:
