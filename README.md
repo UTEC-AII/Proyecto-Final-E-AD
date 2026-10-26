@@ -3,17 +3,29 @@
 **UTEC · Maestría en Ciencia de Datos e IA · Estructuras de Datos y Algoritmos · Prof. Heider Sánchez**
 
 **Repositorio:** https://github.com/UTEC-AII/Proyecto-Final-E-AD
+**Estado:** version `v1.0-entrega` · 19 pruebas en verde · informe de 12 paginas · [PDF](report/Proyecto_Final_Grupo2.pdf)
 
 Pipeline de 10 etapas que procesa un stream de eventos de una tienda en línea (escenario B) con estructuras de datos implementadas desde cero: cada etapa usa la estructura adecuada y su salida alimenta a la siguiente. Un evento entra por una cola FIFO, se limpia, se prioriza, se resuelve en tablas hash, pasa un filtro de fraude probabilístico y termina actualizando índices, similitud, el grafo de co-compra y el servicio de recomendaciones.
 
 ![Pipeline](docs/pipeline.png)
+
+## Contenido
+
+- [Entregables](#entregables)
+- [Instalación y uso](#instalación-y-uso)
+- [Arquitectura](#arquitectura)
+- [Resultados principales](#resultados-principales)
+- [Roles y contribución](#roles-y-contribución)
+- [Correcciones de la versión final](#correcciones-de-la-versión-final)
+- [Colaboración](#colaboración)
+- [Estructura del repositorio](#estructura-del-repositorio)
 
 ## Entregables
 
 | Entregable | Dónde |
 |---|---|
 | Código fuente de las estructuras y el pipeline | [`src/eda/`](src/eda) |
-| Informe PDF (8 a 12 páginas) | [`report/Proyecto_Final_Grupo2.pdf`](report/Proyecto_Final_Grupo2.pdf), fuente LaTeX en [`report/informe.tex`](report/informe.tex) |
+| Informe PDF (8 a 12 páginas) | [`report/Proyecto_Final_Grupo2.pdf`](report/Proyecto_Final_Grupo2.pdf), fuente LaTeX en [`report/Proyecto_Final_Grupo2.tex`](report/Proyecto_Final_Grupo2.tex) |
 | Diapositivas | [`report/Presentacion_Final.pptx`](report/Presentacion_Final.pptx) |
 | Notebook de análisis | [`notebooks/analisis_resultados.ipynb`](notebooks/analisis_resultados.ipynb) |
 | Diagrama del pipeline | [`docs/pipeline.svg`](docs/pipeline.svg) |
@@ -22,7 +34,7 @@ Pipeline de 10 etapas que procesa un stream de eventos de una tienda en línea (
 
 ## Instalación y uso
 
-Requiere Python 3.10 o superior.
+Requiere Python 3.10 o superior; el entregable se validó con 3.13.
 
 ```bash
 pip install -r requirements.txt
@@ -130,7 +142,7 @@ scripts/              preparar datos, correr el pipeline, generar el informe
 bench/                experimentos y figuras
 tests/                pruebas unitarias e integración
 notebooks/            análisis de resultados
-report/               informe, figuras y diapositivas
+report/               informe, figuras y diapositivas (fuente anterior en legacy/)
 results/              CSV de experimentos y resumen de la corrida de 10M
 ```
 

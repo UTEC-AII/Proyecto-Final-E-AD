@@ -14,3 +14,5 @@ report/*.aux
 report/*.log
 report/*.out
 report/*.toc
+.DS_Store
+**/.DS_Store
