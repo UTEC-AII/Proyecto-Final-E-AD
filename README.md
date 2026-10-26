@@ -76,7 +76,7 @@ DuckDB lee los CSV en streaming y toma los primeros 10M eventos en orden tempora
 ## Arquitectura
 
 | Etapa | Estructura (archivo) | Qué hace | Qué entrega |
-|---|---|---|---|---|
+|---|---|---|---|
 | S0 Ingesta | Cola FIFO enlazada ([`linked_queue.py`](src/eda/structures/linked_queue.py)) | Buffer con capacidad entre el lector y el consumidor por lotes | Lotes de eventos |
 | S1 Preprocesamiento | Merge sort + búsqueda binaria ([`sorting.py`](src/eda/structures/sorting.py)) | Valida, normaliza, elimina duplicados contra una ventana de 500K ids y ordena por tiempo | Eventos limpios |
 | S2 Prioridad | Heap binario ([`heap.py`](src/eda/structures/heap.py)) | Compras express, premium, estándar, programadas, carritos, vistas | Eventos en orden de urgencia |
@@ -179,4 +179,4 @@ El repositorio está preparado para que cada integrante suba su parte con un pul
 | `fix/s6-ventana` | Clinton | Ventana móvil sin marcas permanentes |
 | `feat/s7-experimentos` | Ronald | Memoria pico de todas las estructuras |
 
-La versión integrada está en la rama `solucion`. El procedimiento para publicar las ramas y abrir los PR se describe en [`docs/COLABORACION.md`](docs/COLABORACION.md).
+Las cuatro ramas ya están integradas en `main`. El procedimiento para publicar las ramas y abrir los PR se describe en [`docs/COLABORACION.md`](docs/COLABORACION.md).
