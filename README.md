@@ -179,4 +179,4 @@ El repositorio está preparado para que cada integrante suba su parte con un pul
 | `fix/s6-ventana` | Clinton | Ventana móvil sin marcas permanentes |
 | `feat/s7-experimentos` | Ronald | Memoria pico de todas las estructuras |
 
-Las cuatro ramas ya están integradas en `main`. El procedimiento para publicar las ramas y abrir los PR se describe en [`docs/COLABORACION.md`](docs/COLABORACION.md).
+Las ramas de trabajo quedan en el repositorio como registro. El detalle de los siete pull requests, quién abrió cada uno y qué cambió está en [`docs/COLABORACION.md`](docs/COLABORACION.md).

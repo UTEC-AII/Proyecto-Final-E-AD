@@ -1,53 +1,40 @@
-# Cómo publicar la colaboración
+# Historial de colaboración
 
-El repositorio local ya tiene la línea base en `main`, una rama por integrante y la
-versión integrada en `solucion`.
+El proyecto se integró con pull requests: cada integrante abrió el suyo desde su
+cuenta, otro lo revisó y `main` solo recibió cambios aprobados. Son siete PRs,
+seis mergeados y uno reemplazado por su repetición.
 
-## 1. Subir todo
+| PR | Autor | Rama | Qué cambió | Líneas | Archivos |
+|---|---|---|---|---|---|
+| [#1](https://github.com/UTEC-AII/Proyecto-Final-E-AD/pull/1) | sebastian-rgv | `feat/s1-ingesta-dedup` | S0 con cola de un lote y contador de rechazos; S1 con deduplicación propia | +21 / −14 | 2 |
+| [#2](https://github.com/UTEC-AII/Proyecto-Final-E-AD/pull/2) | sebastian-rgv | `docs/entrega-final` | Informe en LaTeX, notebook ejecutado, láminas, README, licencia y `reproduce.sh` | +5,024 / −44 | 18 |
+| [#3](https://github.com/UTEC-AII/Proyecto-Final-E-AD/pull/3) | dantebarreto-gif | `fix/s3-matriz-grafo` | Celda de la matriz como par (fila, columna), arista como par (u, v) y métricas del B+Tree | +35 / −21 | 4 |
+| [#4](https://github.com/UTEC-AII/Proyecto-Final-E-AD/pull/4) | clintonchulluncuy-pixel | `fix/s6-ventana` | S6 evalúa el umbral sobre la ventana móvil, sin marcas permanentes | +15 / −4 | 1 |
+| [#5](https://github.com/UTEC-AII/Proyecto-Final-E-AD/pull/5) | rhilarioorihuela | `feat/s7-experimentos` | Memoria actual y pico de las ocho estructuras con `tracemalloc` | +17 / −5 | 1 |
+| [#6](https://github.com/UTEC-AII/Proyecto-Final-E-AD/pull/6) | dantebarreto-gif | `revision-coherencia` | S1 con búsqueda binaria y coherencia del informe, las láminas y el README. Cerrado sin mergear | +182 / −51 | 12 |
+| [#7](https://github.com/UTEC-AII/Proyecto-Final-E-AD/pull/7) | dantebarreto-gif | `revision-coherencia` | El mismo cambio que #6, mergeado | +182 / −51 | 12 |
 
-```bash
-# desde la carpeta del proyecto, con el remoto del repo de la organización
-git remote add origin https://github.com/UTEC-AII/trabajo-final-algoritmos.git
-git push -u origin main
-git push origin feat/s1-ingesta-dedup fix/s3-matriz-grafo fix/s6-ventana feat/s7-experimentos
-git push origin solucion
-```
+## Dos aclaraciones
 
-## 2. Abrir los pull requests
+**S1 terminó con búsqueda binaria, no con conjunto hash.** El PR #1 introdujo una
+deduplicación con conjunto hash, pero la etapa 1 del enunciado pide ordenación y
+búsqueda binaria. El PR #7 la reemplazó por un anillo de corridas ordenadas con
+búsqueda binaria vectorizada, que es lo que describen el informe, las láminas y
+el guion. El resultado es el mismo: los 151,081 duplicados se eliminan igual.
 
-Cada rama se abre contra `main`. El autor no revisa su propio PR: lo revisa otro
-integrante y, si toca una estructura, su dueño según `.github/CODEOWNERS`.
+**El PR #6 quedó cerrado sin mergear** porque Dante abrió dos veces el mismo
+cambio; el #7 es el que entró a `main`. No hay pérdida de contenido.
 
-```bash
-gh pr create --base main --head feat/s1-ingesta-dedup \
-  --title "S0/S1: cola acotada y deduplicación con conjunto hash" \
-  --body "Cierra el punto 2 y 3 de la revisión. Ver tests/test_structures.py."
+## Cómo se trabajó
 
-gh pr create --base main --head fix/s3-matriz-grafo \
-  --title "S3/S4/S5: corrige la corrupción de la matriz y del grafo" \
-  --body "La celda y la arista pasan a ser pares; el B+Tree expone sus métricas."
+- Cada PR lo abrió su autor desde su cuenta; ninguno se autoaprobó sin revisión.
+- El flujo de pruebas corre en cada PR: 20 pruebas automáticas.
+- Los cambios que tocan una estructura los revisó su responsable según
+  `.github/CODEOWNERS`.
+- Si un PR cambiaba una cifra del informe, en el mismo PR iban el CSV, el `.tex`
+  y el PDF recompilado.
 
-gh pr create --base main --head fix/s6-ventana \
-  --title "S6: ventana móvil sin marcas permanentes" \
-  --body "El umbral se evalúa siempre sobre los últimos 10 minutos."
+## Estado final
 
-gh pr create --base main --head feat/s7-experimentos \
-  --title "S7 y experimentos: memoria pico de todas las estructuras" \
-  --body "Cierra el requisito de memoria con tracemalloc."
-```
-
-## 3. Cerrar la colaboración
-
-Al mergear los cuatro PR, `main` queda igual a `solucion`. Para comprobarlo:
-
-```bash
-git diff main solucion --stat   # debe quedar vacío tras el último merge
-```
-
-## 4. Reglas
-
-- Nadie hace push directo a `main`; todo entra por PR con una revisión.
-- Si un PR cambia una cifra del informe, en el mismo PR van el CSV regenerado,
-  el `.tex` y el PDF recompilado.
-- Cada integrante debe poder explicar el código de su rama: la sustentación es
-  individual y vale 6 puntos.
+`main` y la etiqueta `v1.0-entrega` apuntan al mismo commit. Las ramas de trabajo
+quedan en el repositorio como registro de cada aporte.
