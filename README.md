@@ -25,7 +25,7 @@ Pipeline de 10 etapas que procesa un stream de eventos de una tienda en línea (
 | Entregable | Dónde |
 |---|---|
 | Código fuente de las estructuras y el pipeline | [`src/eda/`](src/eda) |
-| Informe PDF (8 a 12 páginas) | [`report/Proyecto_Final_Grupo2.pdf`](report/Proyecto_Final_Grupo2.pdf), fuente LaTeX en [`report/Proyecto_Final_Grupo2.tex`](report/Proyecto_Final_Grupo2.tex) |
+| Informe PDF| [`report/Proyecto_Final_Grupo2.pdf`](report/Proyecto_Final_Grupo2.pdf), fuente LaTeX en [`report/Proyecto_Final_Grupo2.tex`](report/Proyecto_Final_Grupo2.tex) |
 | Diapositivas | [`report/Presentacion_Final.pptx`](report/Presentacion_Final.pptx) |
 | Notebook de análisis | [`notebooks/analisis_resultados.ipynb`](notebooks/analisis_resultados.ipynb) |
 | Diagrama del pipeline | [`docs/pipeline.svg`](docs/pipeline.svg) |
